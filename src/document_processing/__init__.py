@@ -1,5 +1,5 @@
 """Document processing module."""
 
-from .processor import DoclingProcessor, GeminiFlashProcessor, SimpleTextProcessor
+from .processor import  GeminiFlashProcessor, SimpleTextProcessor
 
-__all__ = ["DoclingProcessor", "GeminiFlashProcessor", "SimpleTextProcessor"]
+__all__ = ["GeminiFlashProcessor", "SimpleTextProcessor"]

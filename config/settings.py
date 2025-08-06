@@ -12,7 +12,7 @@ from typing import Optional
 @dataclass
 class DocumentProcessingConfig:
     """Configuration for document processing."""
-    processor_type: str = "docling"  # "docling" or "gemini_flash"
+    processor_type: str = "gemini_flash"
     chunk_size: int = 800
     chunk_overlap: int = 100
 

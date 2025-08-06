@@ -9,7 +9,7 @@ import os
 from typing import Dict, Any
 
 from .interfaces import DocumentProcessor, EmbeddingProvider, VectorStore, LanguageModel
-from .document_processing import DoclingProcessor, GeminiFlashProcessor
+from .document_processing import GeminiFlashProcessor
 from .embeddings import NomicEmbeddingProvider, CohereEmbeddingProvider
 from .vector_store import ChromaVectorStore, FAISSVectorStore
 from .llm import GeminiLanguageModel
@@ -41,12 +41,7 @@ class RAGFactory:
         """
         processor_type = config.document_processing.processor_type.lower()
         
-        if processor_type == "docling":
-            return DoclingProcessor(
-                chunk_size=config.document_processing.chunk_size,
-                chunk_overlap=config.document_processing.chunk_overlap
-            )
-        elif processor_type == "gemini_flash":
+        if processor_type == "gemini_flash":
             api_key = os.getenv("GOOGLE_API_KEY")
             if not api_key:
                 raise ValueError(
@@ -60,7 +55,7 @@ class RAGFactory:
                 chunk_overlap=config.document_processing.chunk_overlap
             )
         else:
-            raise ValueError(f"Unsupported document processor: {processor_type}. Supported: 'docling', 'gemini_flash'")
+            raise ValueError(f"Unsupported document processor: {processor_type}. Supported: 'gemini_flash'")
     
     @staticmethod
     def create_embedding_provider(config: RAGConfig) -> EmbeddingProvider:
