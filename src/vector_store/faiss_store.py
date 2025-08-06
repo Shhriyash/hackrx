@@ -3,7 +3,7 @@ FAISS vector store implementation.
 
 This module provides vector storage and retrieval capabilities using FAISS
 for efficient similarity search in the RAG pipeline. FAISS is significantly
-faster and more lightweight than ChromaDB.
+faster.
 """
 
 import numpy as np

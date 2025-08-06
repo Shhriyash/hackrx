@@ -11,7 +11,7 @@ from typing import Dict, Any
 from .interfaces import DocumentProcessor, EmbeddingProvider, VectorStore, LanguageModel
 from .document_processing import GeminiFlashProcessor
 from .embeddings import NomicEmbeddingProvider, CohereEmbeddingProvider
-from .vector_store import ChromaVectorStore, FAISSVectorStore
+from .vector_store import FAISSVectorStore
 from .llm import GeminiLanguageModel
 from .rag import RAGPipeline, PromptBuilder
 from config import RAGConfig
@@ -109,12 +109,7 @@ class RAGFactory:
         # Get the vector store type from config, default to 'faiss' for better performance
         store_type = getattr(config.vector_store, 'type', 'faiss').lower()
         
-        if store_type == 'chroma':
-            return ChromaVectorStore(
-                collection_name=config.vector_store.collection_name,
-                persist_directory=config.vector_store.persist_directory
-            )
-        elif store_type == 'faiss':
+        if store_type == 'faiss':
             # Get dimension from config, default to 1024 (Cohere embed-english-v3.0)
             dimension = getattr(config.vector_store, 'dimension', 1024)
             return FAISSVectorStore(
@@ -122,7 +117,7 @@ class RAGFactory:
                 persist_directory=config.vector_store.persist_directory
             )
         else:
-            raise ValueError(f"Unsupported vector store type: {store_type}. Supported: 'chroma', 'faiss'")
+            raise ValueError(f"Unsupported vector store type: {store_type}. Supported: 'faiss'")
     
     @staticmethod
     def create_language_model(config: RAGConfig) -> LanguageModel:
