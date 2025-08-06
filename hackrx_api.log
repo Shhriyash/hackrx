@@ -1,0 +1,208 @@
+2025-08-06 13:35:44,790 - __main__ - INFO - [1754467544_-6630130786986168498] Starting request processing
+2025-08-06 13:35:44,791 - __main__ - INFO - [1754467544_-6630130786986168498] Processing document: https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D
+2025-08-06 13:35:44,791 - __main__ - INFO - Starting document processing for URL: https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D
+2025-08-06 13:35:45,460 - httpx - INFO - HTTP Request: GET https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D "HTTP/1.1 200 OK"
+2025-08-06 13:35:45,653 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-08-06 13:37:54,722 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent "HTTP/1.1 200 OK"
+2025-08-06 13:37:54,950 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-08-06 13:37:54,957 - __main__ - INFO - Document processing completed in 130.17 seconds. Created 243 chunks
+2025-08-06 13:37:54,957 - __main__ - INFO - [1754467544_-6630130786986168498] Created 243 chunks in 130.17 seconds
+2025-08-06 13:37:54,957 - __main__ - INFO - [1754467544_-6630130786986168498] Indexing chunks...
+2025-08-06 13:37:54,957 - __main__ - INFO - Starting indexing of 243 chunks
+2025-08-06 13:37:55,533 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:37:57,074 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:37:58,540 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:37:58,968 - __main__ - INFO - Generated embeddings in 4.01 seconds
+2025-08-06 13:37:58,980 - __main__ - INFO - Stored embeddings in vector store in 0.01 seconds
+2025-08-06 13:37:58,981 - __main__ - INFO - Total indexing completed in 4.02 seconds
+2025-08-06 13:37:58,985 - __main__ - INFO - [1754467544_-6630130786986168498] Indexing completed in 4.03 seconds
+2025-08-06 13:37:58,985 - __main__ - INFO - [1754467544_-6630130786986168498] Answering 10 questions...
+2025-08-06 13:37:58,986 - __main__ - INFO - Starting to answer 10 questions
+2025-08-06 13:37:59,321 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:37:59,331 - __main__ - INFO - Retrieved 7 contexts in 0.35s (embed: 0.34s, search: 0.00s)
+2025-08-06 13:37:59,654 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:37:59,666 - __main__ - INFO - Retrieved 7 contexts in 0.34s (embed: 0.33s, search: 0.00s)
+2025-08-06 13:37:59,989 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:38:00,002 - __main__ - INFO - Retrieved 7 contexts in 0.33s (embed: 0.33s, search: 0.00s)
+2025-08-06 13:38:00,334 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:38:00,347 - __main__ - INFO - Retrieved 7 contexts in 0.34s (embed: 0.34s, search: 0.00s)
+2025-08-06 13:38:00,679 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:38:00,691 - __main__ - INFO - Retrieved 7 contexts in 0.34s (embed: 0.34s, search: 0.00s)
+2025-08-06 13:38:01,019 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:38:01,032 - __main__ - INFO - Retrieved 7 contexts in 0.34s (embed: 0.34s, search: 0.00s)
+2025-08-06 13:38:01,360 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:38:01,372 - __main__ - INFO - Retrieved 7 contexts in 0.34s (embed: 0.34s, search: 0.00s)
+2025-08-06 13:38:01,712 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:38:01,724 - __main__ - INFO - Retrieved 7 contexts in 0.35s (embed: 0.35s, search: 0.00s)
+2025-08-06 13:38:02,069 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:38:02,082 - __main__ - INFO - Retrieved 7 contexts in 0.36s (embed: 0.35s, search: 0.00s)
+2025-08-06 13:38:02,411 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:38:02,425 - __main__ - INFO - Retrieved 7 contexts in 0.34s (embed: 0.34s, search: 0.00s)
+2025-08-06 13:38:02,425 - __main__ - INFO - Retrieved contexts in 3.44 seconds. Unique contexts: 54
+2025-08-06 13:38:08,705 - __main__ - INFO - LLM response generated in 6.28 seconds
+2025-08-06 13:38:08,706 - __main__ - INFO - Question answering completed in 9.72 seconds (context: 3.44s, LLM: 6.28s, parse: 0.00s)
+2025-08-06 13:38:08,706 - __main__ - INFO - [1754467544_-6630130786986168498] Request completed in 143.92 seconds
+2025-08-06 13:38:08,706 - __main__ - INFO - [1754467544_-6630130786986168498] Timing breakdown - Doc: 130.17s, Index: 4.03s, QA: 9.72s
+2025-08-06 13:38:08,707 - __main__ - INFO - Audit log saved to audit_logs/request_1754467544_-6630130786986168498_20250806_133808.json
+2025-08-06 13:38:37,208 - __main__ - INFO - [1754467717_-6630130786986168498] Starting request processing
+2025-08-06 13:38:37,209 - __main__ - INFO - [1754467717_-6630130786986168498] Processing document: https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D
+2025-08-06 13:38:37,210 - __main__ - INFO - Starting document processing for URL: https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D
+2025-08-06 13:38:37,871 - httpx - INFO - HTTP Request: GET https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D "HTTP/1.1 200 OK"
+2025-08-06 13:38:37,996 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-08-06 13:40:54,121 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent "HTTP/1.1 200 OK"
+2025-08-06 13:40:54,348 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-08-06 13:40:54,358 - __main__ - INFO - Document processing completed in 137.15 seconds. Created 273 chunks
+2025-08-06 13:40:54,359 - __main__ - INFO - [1754467717_-6630130786986168498] Created 273 chunks in 137.15 seconds
+2025-08-06 13:40:54,359 - __main__ - INFO - [1754467717_-6630130786986168498] Indexing chunks...
+2025-08-06 13:40:54,359 - __main__ - INFO - Starting indexing of 273 chunks
+2025-08-06 13:40:54,985 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:40:57,232 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:40:59,335 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:41:00,544 - __main__ - INFO - Generated embeddings in 6.18 seconds
+2025-08-06 13:41:00,578 - __main__ - INFO - Stored embeddings in vector store in 0.03 seconds
+2025-08-06 13:41:00,579 - __main__ - INFO - Total indexing completed in 6.22 seconds
+2025-08-06 13:41:00,587 - __main__ - INFO - [1754467717_-6630130786986168498] Indexing completed in 6.23 seconds
+2025-08-06 13:41:00,590 - __main__ - INFO - [1754467717_-6630130786986168498] Answering 10 questions...
+2025-08-06 13:41:00,591 - __main__ - INFO - Starting to answer 10 questions
+2025-08-06 13:41:00,921 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:41:00,945 - __main__ - INFO - Retrieved 7 contexts in 0.35s (embed: 0.35s, search: 0.00s)
+2025-08-06 13:41:01,265 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:41:01,283 - __main__ - INFO - Retrieved 7 contexts in 0.34s (embed: 0.33s, search: 0.01s)
+2025-08-06 13:41:01,600 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:41:01,634 - __main__ - INFO - Retrieved 7 contexts in 0.35s (embed: 0.33s, search: 0.02s)
+2025-08-06 13:41:01,960 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:41:01,979 - __main__ - INFO - Retrieved 7 contexts in 0.34s (embed: 0.34s, search: 0.01s)
+2025-08-06 13:41:02,338 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:41:02,354 - __main__ - INFO - Retrieved 7 contexts in 0.37s (embed: 0.37s, search: 0.00s)
+2025-08-06 13:41:02,680 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:41:02,702 - __main__ - INFO - Retrieved 7 contexts in 0.35s (embed: 0.34s, search: 0.01s)
+2025-08-06 13:41:03,045 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:41:03,071 - __main__ - INFO - Retrieved 7 contexts in 0.37s (embed: 0.36s, search: 0.01s)
+2025-08-06 13:41:03,401 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:41:03,423 - __main__ - INFO - Retrieved 7 contexts in 0.35s (embed: 0.34s, search: 0.01s)
+2025-08-06 13:41:03,753 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:41:03,791 - __main__ - INFO - Retrieved 7 contexts in 0.37s (embed: 0.36s, search: 0.01s)
+2025-08-06 13:41:04,127 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:41:04,143 - __main__ - INFO - Retrieved 7 contexts in 0.35s (embed: 0.34s, search: 0.01s)
+2025-08-06 13:41:04,144 - __main__ - INFO - Retrieved contexts in 3.55 seconds. Unique contexts: 56
+2025-08-06 13:41:07,130 - __main__ - INFO - LLM response generated in 2.98 seconds
+2025-08-06 13:41:07,131 - __main__ - INFO - Question answering completed in 6.54 seconds (context: 3.55s, LLM: 2.98s, parse: 0.00s)
+2025-08-06 13:41:07,131 - __main__ - INFO - [1754467717_-6630130786986168498] Request completed in 149.92 seconds
+2025-08-06 13:41:07,131 - __main__ - INFO - [1754467717_-6630130786986168498] Timing breakdown - Doc: 137.15s, Index: 6.23s, QA: 6.54s
+2025-08-06 13:41:07,133 - __main__ - INFO - Audit log saved to audit_logs/request_1754467717_-6630130786986168498_20250806_134107.json
+2025-08-06 13:47:45,306 - src.document_processing.processor - INFO - Initializing GeminiFlashProcessor...
+2025-08-06 13:47:47,338 - src.document_processing.processor - INFO - Gemini client initialized in 2.024s
+2025-08-06 13:47:47,338 - src.document_processing.processor - INFO - Text splitter initialized in 0.000s
+2025-08-06 13:47:47,338 - src.document_processing.processor - INFO - GeminiFlashProcessor fully initialized in 2.024s
+2025-08-06 13:48:12,021 - __main__ - INFO - [1754468292_2736228874295724420] Starting request processing
+2025-08-06 13:48:12,022 - __main__ - INFO - [1754468292_2736228874295724420] Processing document: https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D
+2025-08-06 13:48:12,022 - __main__ - INFO - Starting document processing for URL: https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D
+2025-08-06 13:48:12,023 - src.document_processing.processor - INFO - Starting Gemini document processing for URL: https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D
+2025-08-06 13:48:12,023 - src.document_processing.processor - INFO - Downloading PDF from: https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D
+2025-08-06 13:48:12,742 - httpx - INFO - HTTP Request: GET https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D "HTTP/1.1 200 OK"
+2025-08-06 13:48:12,870 - src.document_processing.processor - INFO - PDF download completed in 0.846s - Size: 704602 bytes
+2025-08-06 13:48:12,870 - src.document_processing.processor - INFO - Processing PDF with Gemini Flash 2.5...
+2025-08-06 13:48:12,871 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-08-06 13:49:18,665 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent "HTTP/1.1 200 OK"
+2025-08-06 13:49:18,873 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-08-06 13:49:18,885 - src.document_processing.processor - INFO - Gemini processing completed in 66.015s - Extracted 112121 characters
+2025-08-06 13:49:18,886 - src.document_processing.processor - INFO - Splitting text into chunks...
+2025-08-06 13:49:18,894 - src.document_processing.processor - INFO - Text splitting completed in 0.009s - Created 51 raw chunks
+2025-08-06 13:49:18,898 - src.document_processing.processor - INFO - Chunk object creation completed in 0.001s
+2025-08-06 13:49:18,899 - src.document_processing.processor - INFO - Total Gemini document processing completed in 66.875s
+2025-08-06 13:49:18,910 - src.document_processing.processor - INFO - Timing breakdown - Download: 0.846s, Gemini: 66.015s, Chunking: 0.009s, Processing: 0.001s
+2025-08-06 13:49:18,914 - src.document_processing.processor - INFO - Final result: 51 processed chunks
+2025-08-06 13:49:18,916 - __main__ - INFO - Document processing completed in 66.89 seconds. Created 51 chunks
+2025-08-06 13:49:18,924 - __main__ - INFO - [1754468292_2736228874295724420] Created 51 chunks in 66.90 seconds
+2025-08-06 13:49:18,926 - __main__ - INFO - [1754468292_2736228874295724420] Indexing chunks...
+2025-08-06 13:49:18,926 - __main__ - INFO - Starting indexing of 51 chunks
+2025-08-06 13:49:19,799 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:49:20,751 - __main__ - INFO - Generated embeddings in 1.82 seconds
+2025-08-06 13:49:20,760 - __main__ - INFO - Stored embeddings in vector store in 0.01 seconds
+2025-08-06 13:49:20,760 - __main__ - INFO - Total indexing completed in 1.83 seconds
+2025-08-06 13:49:20,762 - __main__ - INFO - [1754468292_2736228874295724420] Indexing completed in 1.84 seconds
+2025-08-06 13:49:20,763 - __main__ - INFO - [1754468292_2736228874295724420] Answering 10 questions...
+2025-08-06 13:49:20,764 - __main__ - INFO - Starting to answer 10 questions
+2025-08-06 13:49:21,098 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:49:21,109 - __main__ - INFO - Retrieved 7 contexts in 0.34s (embed: 0.34s, search: 0.00s)
+2025-08-06 13:49:21,451 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:49:21,467 - __main__ - INFO - Retrieved 7 contexts in 0.36s (embed: 0.35s, search: 0.00s)
+2025-08-06 13:49:21,800 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:49:21,818 - __main__ - INFO - Retrieved 7 contexts in 0.35s (embed: 0.35s, search: 0.00s)
+2025-08-06 13:49:22,294 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:49:22,310 - __main__ - INFO - Retrieved 7 contexts in 0.49s (embed: 0.49s, search: 0.00s)
+2025-08-06 13:49:22,639 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:49:22,655 - __main__ - INFO - Retrieved 7 contexts in 0.34s (embed: 0.34s, search: 0.01s)
+2025-08-06 13:49:22,976 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:49:22,995 - __main__ - INFO - Retrieved 7 contexts in 0.34s (embed: 0.33s, search: 0.01s)
+2025-08-06 13:49:23,319 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:49:23,336 - __main__ - INFO - Retrieved 7 contexts in 0.34s (embed: 0.34s, search: 0.01s)
+2025-08-06 13:49:23,669 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:49:23,683 - __main__ - INFO - Retrieved 7 contexts in 0.35s (embed: 0.34s, search: 0.00s)
+2025-08-06 13:49:24,039 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:49:24,053 - __main__ - INFO - Retrieved 7 contexts in 0.37s (embed: 0.36s, search: 0.01s)
+2025-08-06 13:49:24,373 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 13:49:24,390 - __main__ - INFO - Retrieved 7 contexts in 0.34s (embed: 0.33s, search: 0.01s)
+2025-08-06 13:49:24,390 - __main__ - INFO - Retrieved contexts in 3.63 seconds. Unique contexts: 23
+2025-08-06 13:49:31,023 - __main__ - INFO - LLM response generated in 6.63 seconds
+2025-08-06 13:49:31,024 - __main__ - INFO - Question answering completed in 10.26 seconds (context: 3.63s, LLM: 6.63s, parse: 0.00s)
+2025-08-06 13:49:31,024 - __main__ - INFO - [1754468292_2736228874295724420] Request completed in 79.00 seconds
+2025-08-06 13:49:31,024 - __main__ - INFO - [1754468292_2736228874295724420] Timing breakdown - Doc: 66.90s, Index: 1.84s, QA: 10.26s
+2025-08-06 13:49:31,241 - __main__ - INFO - Audit log saved to audit_logs/request_1754468292_2736228874295724420_20250806_134931.json
+2025-08-06 14:07:25,010 - src.document_processing.processor - INFO - Initializing SimpleTextProcessor...
+2025-08-06 14:07:25,010 - src.document_processing.processor - INFO - Text splitter initialized in 0.000s
+2025-08-06 14:07:25,010 - src.document_processing.processor - INFO - SimpleTextProcessor fully initialized in 0.000s
+2025-08-06 14:07:33,315 - __main__ - INFO - [1754469453_7494602248884523037] Starting request processing
+2025-08-06 14:07:33,315 - __main__ - INFO - [1754469453_7494602248884523037] Processing document: https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D
+2025-08-06 14:07:33,316 - __main__ - INFO - Starting document processing for URL: https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D
+2025-08-06 14:07:33,317 - src.document_processing.processor - INFO - Starting simple text extraction for: https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D
+2025-08-06 14:07:33,317 - src.document_processing.processor - INFO - Downloading document from: https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D
+2025-08-06 14:07:33,973 - httpx - INFO - HTTP Request: GET https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D "HTTP/1.1 200 OK"
+2025-08-06 14:07:34,097 - src.document_processing.processor - INFO - Document download completed in 0.780s - Size: 704602 bytes
+2025-08-06 14:07:34,098 - src.document_processing.processor - INFO - Extracting text from PDF using PyPDF2...
+2025-08-06 14:07:38,929 - src.document_processing.processor - INFO - PDF text extraction completed in 4.831s - 25 pages processed
+2025-08-06 14:07:38,930 - src.document_processing.processor - INFO - Text extraction completed in 4.832s - Extracted 113715 characters
+2025-08-06 14:07:38,931 - src.document_processing.processor - INFO - Splitting text into chunks...
+2025-08-06 14:07:38,937 - src.document_processing.processor - INFO - Text splitting completed in 0.005s - Created 166 raw chunks
+2025-08-06 14:07:38,937 - src.document_processing.processor - INFO - Chunk object creation completed in 0.000s
+2025-08-06 14:07:38,937 - src.document_processing.processor - INFO - Total text extraction completed in 5.619s
+2025-08-06 14:07:38,938 - src.document_processing.processor - INFO - Timing breakdown - Download: 0.780s, Extract: 4.832s, Chunking: 0.005s, Processing: 0.000s
+2025-08-06 14:07:38,938 - src.document_processing.processor - INFO - Final result: 166 processed chunks
+2025-08-06 14:07:38,939 - __main__ - INFO - Document processing completed in 5.62 seconds. Created 166 chunks
+2025-08-06 14:07:38,940 - __main__ - INFO - [1754469453_7494602248884523037] Created 166 chunks in 5.62 seconds
+2025-08-06 14:07:38,940 - __main__ - INFO - [1754469453_7494602248884523037] Indexing chunks...
+2025-08-06 14:07:38,940 - __main__ - INFO - Starting indexing of 166 chunks
+2025-08-06 14:07:39,557 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 14:07:41,940 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 14:07:43,501 - __main__ - INFO - Generated embeddings in 4.56 seconds
+2025-08-06 14:07:43,514 - __main__ - INFO - Stored embeddings in vector store in 0.01 seconds
+2025-08-06 14:07:43,515 - __main__ - INFO - Total indexing completed in 4.58 seconds
+2025-08-06 14:07:43,519 - __main__ - INFO - [1754469453_7494602248884523037] Indexing completed in 4.58 seconds
+2025-08-06 14:07:43,520 - __main__ - INFO - [1754469453_7494602248884523037] Answering 10 questions...
+2025-08-06 14:07:43,520 - __main__ - INFO - Starting to answer 10 questions
+2025-08-06 14:07:43,854 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 14:07:43,868 - __main__ - INFO - Retrieved 7 contexts in 0.35s (embed: 0.35s, search: 0.00s)
+2025-08-06 14:07:44,200 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 14:07:44,221 - __main__ - INFO - Retrieved 7 contexts in 0.35s (embed: 0.34s, search: 0.01s)
+2025-08-06 14:07:44,561 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 14:07:44,596 - __main__ - INFO - Retrieved 7 contexts in 0.37s (embed: 0.36s, search: 0.01s)
+2025-08-06 14:07:45,019 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 14:07:45,041 - __main__ - INFO - Retrieved 7 contexts in 0.44s (embed: 0.43s, search: 0.01s)
+2025-08-06 14:07:45,397 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 14:07:45,424 - __main__ - INFO - Retrieved 7 contexts in 0.38s (embed: 0.38s, search: 0.00s)
+2025-08-06 14:07:45,769 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 14:07:45,792 - __main__ - INFO - Retrieved 7 contexts in 0.37s (embed: 0.36s, search: 0.00s)
+2025-08-06 14:07:46,126 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 14:07:46,146 - __main__ - INFO - Retrieved 7 contexts in 0.35s (embed: 0.34s, search: 0.01s)
+2025-08-06 14:07:46,486 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 14:07:46,521 - __main__ - INFO - Retrieved 7 contexts in 0.37s (embed: 0.36s, search: 0.01s)
+2025-08-06 14:07:46,855 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 14:07:46,877 - __main__ - INFO - Retrieved 7 contexts in 0.36s (embed: 0.35s, search: 0.01s)
+2025-08-06 14:07:47,230 - httpx - INFO - HTTP Request: POST https://api.cohere.com/v1/embed "HTTP/1.1 200 OK"
+2025-08-06 14:07:47,256 - __main__ - INFO - Retrieved 7 contexts in 0.38s (embed: 0.37s, search: 0.01s)
+2025-08-06 14:07:47,257 - __main__ - INFO - Retrieved contexts in 3.74 seconds. Unique contexts: 54
+2025-08-06 14:07:52,276 - __main__ - INFO - LLM response generated in 5.02 seconds
+2025-08-06 14:07:52,276 - __main__ - INFO - Question answering completed in 8.76 seconds (context: 3.74s, LLM: 5.02s, parse: 0.00s)
+2025-08-06 14:07:52,277 - __main__ - INFO - [1754469453_7494602248884523037] Request completed in 18.96 seconds
+2025-08-06 14:07:52,277 - __main__ - INFO - [1754469453_7494602248884523037] Timing breakdown - Doc: 5.62s, Index: 4.58s, QA: 8.76s
+2025-08-06 14:07:52,391 - __main__ - INFO - Audit log saved to audit_logs/request_1754469453_7494602248884523037_20250806_140752.json

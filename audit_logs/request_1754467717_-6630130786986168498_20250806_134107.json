@@ -1,0 +1,41 @@
+{
+  "request_id": "1754467717_-6630130786986168498",
+  "timestamp": "2025-08-06T13:41:07.132192",
+  "request": {
+    "document_url": "https://hackrx.blob.core.windows.net/assets/policy.pdf?sv=2023-01-03&st=2025-07-04T09%3A11%3A24Z&se=2027-07-05T09%3A11%3A00Z&sr=b&sp=r&sig=N4a9OU0w0QXO6AOIBiu4bpl7AXvEZogeT%2FjUHNO7HzQ%3D",
+    "questions": [
+      "What is the grace period for premium payment under the National Parivar Mediclaim Plus Policy?",
+      "What is the waiting period for pre-existing diseases (PED) to be covered?",
+      "Does this policy cover maternity expenses, and what are the conditions?",
+      "What is the waiting period for cataract surgery?",
+      "Are the medical expenses for an organ donor covered under this policy?",
+      "What is the No Claim Discount (NCD) offered in this policy?",
+      "Is there a benefit for preventive health check-ups?",
+      "How does the policy define a 'Hospital'?",
+      "What is the extent of coverage for AYUSH treatments?",
+      "Are there any sub-limits on room rent and ICU charges for Plan A?"
+    ],
+    "num_questions": 10
+  },
+  "response": {
+    "answers": [
+      "The document does not state the grace period for premium payment.",
+      "Pre-existing diseases are covered after 36 months of continuous coverage. If the insured person is continuously covered without any break as per portability norms, the waiting period is reduced to the extent of prior coverage.",
+      "Yes, maternity expenses are covered, but with several conditions. These include: the female insured person being between 18 and 45 years old, delivery or termination occurring after a 24-month waiting period (waivable only for accidental miscarriage/abortion), coverage limited to two deliveries/terminations, and not more than one delivery/termination in a single policy period.",
+      "The waiting period for cataract surgery is 2 years, covered after the waiting period of 2 years.",
+      "Yes, the medical expenses for an organ donor's hospitalization during the policy period for harvesting the organ are covered, provided certain conditions are met, including adherence to the Transplantation of Human Organs Act 1994, the organ being used for an insured person, and the insured person having been medically advised for a transplant.",
+      "A No Claim Discount (NCD) of 5% on the base premium is allowed on renewal of policies with a term of one year, provided no claims are reported in the expiring policy. For policies with terms exceeding one year, the NCD is aggregated and allowed on renewal, not exceeding 5% of the total base premium for the term.",
+      "Yes, expenses of health check-up shall be reimbursed at the end of a block of two continuous policy years, provided the policy has been continuously renewed without a break. The expenses are subject to the limit stated in the Table of Benefits.",
+      "A 'Hospital' is defined as any institution established for in-patient care and day care treatment of disease/injuries, registered with local authorities, and meeting specific criteria: qualified nursing staff round the clock, a minimum number of inpatient beds (10 for towns with population less than 10 lacs, 15 elsewhere), qualified medical practitioner(s) in charge round the clock, and a fully equipped operation theatre.",
+      "AYUSH treatments are covered up to the Sum Insured (SI) as a floater.",
+      "Yes, for Plan A, Room charges are up to 1% of SI or actual, whichever is lower, and ICU charges are up to 2% of SI or actual, whichever is lower, per day per insured person."
+    ],
+    "num_answers": 10
+  },
+  "timing": {
+    "total_time": 149.9229998588562,
+    "document_processing_time": 137.14989972114563,
+    "indexing_time": 6.228008508682251,
+    "question_answering_time": 6.540716171264648
+  }
+}

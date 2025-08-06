@@ -1,0 +1,21 @@
+{
+  "document_processing": {
+    "processor_type": "gemini_flash",
+    "chunk_size": 800,
+    "chunk_overlap": 100
+  },
+  "embedding": {
+    "provider": "nomic",
+    "model_name": "nomic-ai/nomic-embed-text-v1.5",
+    "batch_size": 32,
+    "input_type": "search_document"
+  },
+  "vector_store": {
+    "collection_name": "pdf_chunks_gemini",
+    "persist_directory": null
+  },
+  "language_model": {
+    "model_name": "gemini-1.5-flash"
+  },
+  "default_n_results": 10
+}

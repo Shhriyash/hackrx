@@ -1,0 +1,20 @@
+{
+  "document_processing": {
+    "chunk_size": 800,
+    "chunk_overlap": 100
+  },
+  "embedding": {
+    "provider": "cohere",
+    "model_name": "embed-english-v3.0",
+    "batch_size": 96,
+    "input_type": "search_document"
+  },
+  "vector_store": {
+    "collection_name": "pdf_chunks",
+    "persist_directory": "./vector_db"
+  },
+  "language_model": {
+    "model_name": "gemini-1.5-flash"
+  },
+  "default_n_results": 10
+}
