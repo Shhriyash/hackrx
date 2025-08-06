@@ -20,7 +20,7 @@ class DocumentProcessingConfig:
 @dataclass
 class EmbeddingConfig:
     """Configuration for embedding generation."""
-    provider: str = "nomic"  # "nomic" or "cohere"
+    provider: str = "cohere"  # "nomic" or "cohere"
     model_name: str = "nomic-ai/nomic-embed-text-v1.5"
     batch_size: int = 32
     input_type: str = "search_document"  # For Cohere: "search_document", "search_query", "classification", "clustering"

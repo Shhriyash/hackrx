@@ -10,7 +10,7 @@ from typing import Dict, Any
 
 from .interfaces import DocumentProcessor, EmbeddingProvider, VectorStore, LanguageModel
 from .document_processing import GeminiFlashProcessor
-from .embeddings import NomicEmbeddingProvider, CohereEmbeddingProvider
+from .embeddings import CohereEmbeddingProvider
 from .vector_store import FAISSVectorStore
 from .llm import GeminiLanguageModel
 from .rag import RAGPipeline, PromptBuilder
@@ -73,12 +73,7 @@ class RAGFactory:
         """
         provider = config.embedding.provider.lower()
         
-        if provider == "nomic":
-            return NomicEmbeddingProvider(
-                model_name=config.embedding.model_name,
-                batch_size=config.embedding.batch_size
-            )
-        elif provider == "cohere":
+        if provider == "cohere":
             api_key = os.getenv("COHERE_API_KEY")
             if not api_key:
                 raise ValueError(
