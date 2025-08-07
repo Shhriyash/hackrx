@@ -173,8 +173,8 @@ class SimpleTextProcessor(DocumentProcessor):
     This processor extracts text without OCR, relying on embedded text content.
     Supports both local files and URLs for PDF/DOCX documents.
     """
-    
-    def __init__(self, chunk_size: int = 800, chunk_overlap: int = 100):
+
+    def __init__(self, chunk_size: int = 9000, chunk_overlap: int = 300):
         """
         Initialize the Simple Text processor.
         

@@ -82,7 +82,7 @@ class RAGPipeline:
         #     chunk_size=800,
         #     chunk_overlap=100
         # )
-        self.document_processor = SimpleTextProcessor(chunk_size=800, chunk_overlap=100)
+        self.document_processor = SimpleTextProcessor(chunk_size=9000, chunk_overlap=300)
 
 
         self.embedding_provider = CohereEmbeddingProvider(
@@ -220,16 +220,23 @@ CONTEXT:
 QUESTIONS:
 {json.dumps(questions, indent=2)}
 
-Please provide accurate, specific answers based only on the information in the context. If information is not available in the context, state that clearly.
+Instructions:
+1. Provide accurate, specific answers based only on the information in the context
+2. For each answer, ALWAYS include relevant excerpts or quotes from the context that support your answer
+3. Reference specific parts of the context by including phrases like "According to the document..." or "As stated in the context..."
+4. If information is not available in the context, state that clearly
+5. Make your answers comprehensive by including the supporting context/evidence within the answer itself
 
 Return the response in this exact JSON format:
 {{
     "dummy_key": [
-        "Answer to question 1",
-        "Answer to question 2",
+        "Answer to question 1 with supporting context quotes",
+        "Answer to question 2 with supporting context quotes",
         ...
     ]
 }}
+
+Example answer format: "According to the document, [specific quote from context]. This means that [your interpretation/answer]. The context also mentions that [additional supporting quote if relevant]."
 """
         
         # Get response from language model
