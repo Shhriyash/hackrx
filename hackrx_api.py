@@ -82,7 +82,7 @@ class RAGPipeline:
         #     chunk_size=800,
         #     chunk_overlap=100
         # )
-        self.document_processor = SimpleTextProcessor(chunk_size=9000, chunk_overlap=300)
+        self.document_processor = SimpleTextProcessor(chunk_size=2000, chunk_overlap=200)
 
 
         self.embedding_provider = CohereEmbeddingProvider(
@@ -98,8 +98,12 @@ class RAGPipeline:
         
         self.language_model = GeminiLanguageModel(
             api_key=os.getenv("GOOGLE_API_KEY"),
-            model_name="gemini-2.5-flash-lite" 
+            model_name="gemini-2.5-flash" 
         )
+        
+        # For neighbor chunk lookup
+        self.chunk_lookup = {}  # {sequence_index: chunk_data}
+        self.total_chunks = 0   # Total number of chunks for boundary checks
     
     def process_document(self, document_url: str) -> List[Dict[str, Any]]:
         """Process a document and return chunks."""
@@ -107,6 +111,10 @@ class RAGPipeline:
         logger.info(f"Starting document processing for URL: {document_url}")
         
         chunks = self.document_processor.process_document(document_url)
+        
+        # Add sequence_index to each chunk for neighbor retrieval
+        for i, chunk in enumerate(chunks):
+            chunk["sequence_index"] = i
         
         processing_time = time.time() - start_time
         logger.info(f"Document processing completed in {processing_time:.2f} seconds. Created {len(chunks)} chunks")
@@ -119,6 +127,7 @@ class RAGPipeline:
             "chunks_preview": [
                 {
                     "chunk_id": chunk.get("chunk_id", "unknown"),
+                    "sequence_index": chunk.get("sequence_index", "unknown"),
                     "page_number": chunk.get("page_number", "unknown"),
                     "content_length": len(chunk.get("content", "")),
                     "content_preview": chunk.get("content", "")
@@ -133,6 +142,10 @@ class RAGPipeline:
         """Index document chunks in the vector store."""
         start_time = time.time()
         logger.info(f"Starting indexing of {len(chunks)} chunks")
+        
+        # Store total chunks and create lookup for neighbor retrieval
+        self.total_chunks = len(chunks)
+        self.chunk_lookup = {chunk["sequence_index"]: chunk for chunk in chunks}
         
         # Extract text content
         texts = [chunk["content"] for chunk in chunks]
@@ -152,9 +165,10 @@ class RAGPipeline:
         
         total_time = time.time() - start_time
         logger.info(f"Total indexing completed in {total_time:.2f} seconds")
+        logger.info(f"Created chunk lookup for {self.total_chunks} chunks with neighbor retrieval capability")
     
     def retrieve_context(self, query: str, top_k: int = 7) -> List[str]:
-        """Retrieve relevant context for a query."""
+        """Retrieve relevant context for a query with neighboring chunks."""
         start_time = time.time()
         
         # Generate query embedding
@@ -162,21 +176,44 @@ class RAGPipeline:
         query_embedding = self.embedding_provider.get_embeddings([query])[0]
         query_embed_time = time.time() - query_embed_start
         
-        # Search vector store
+        # Search vector store for top-k chunks
         search_start = time.time()
         results = self.vector_store.search(query_embedding, top_k)
         search_time = time.time() - search_start
         
-        # Extract text content
-        contexts = []
-        for result in results:
-            if "content" in result:
-                contexts.append(result["content"])
-            elif "text" in result:
-                contexts.append(result["text"])
+        # Expand with neighboring chunks
+        expand_start = time.time()
+        expanded_indices = set()
         
+        for result in results:
+            seq_idx = int(result["metadata"]["chunk_id"][6:])
+            
+            # Add current chunk
+            expanded_indices.add(seq_idx)
+            
+            # Add previous chunk (seq_idx - 1) if exists
+            if seq_idx - 1 >= 0:
+                expanded_indices.add(seq_idx - 1)
+                
+            # Add next chunk (seq_idx + 1) if exists  
+            if seq_idx + 1 < self.total_chunks:
+                expanded_indices.add(seq_idx + 1)
+        
+        # Sort by document order (sequence_index)
+        sorted_indices = sorted(expanded_indices)
+        
+        # Get content in document order
+        contexts = []
+        for idx in sorted_indices:
+            if idx in self.chunk_lookup:
+                contexts.append(self.chunk_lookup[idx]["content"])
+        
+        expand_time = time.time() - expand_start
         total_time = time.time() - start_time
-        logger.info(f"Retrieved {len(contexts)} contexts in {total_time:.2f}s (embed: {query_embed_time:.2f}s, search: {search_time:.2f}s)")
+        
+        logger.info(f"Retrieved {len(contexts)} expanded contexts (from {len(results)} top-k) in {total_time:.2f}s")
+        logger.info(f"Timing breakdown - embed: {query_embed_time:.2f}s, search: {search_time:.2f}s, expand: {expand_time:.2f}s")
+        logger.info(f"Expanded from indices {[r.get('sequence_index', 'unknown') for r in results]} to {sorted_indices}")
         
         return contexts
     
@@ -222,10 +259,10 @@ QUESTIONS:
 
 Instructions:
 1. Provide accurate, specific answers based only on the information in the context
-2. For each answer, ALWAYS include relevant excerpts or quotes from the context that support your answer
-3. Reference specific parts of the context by including phrases like "According to the document..." or "As stated in the context..."
+2. Try to include relevant excerpts or quotes from the context that support your answer whenever possible
+3. Reference specific parts of the context by including phrases like "According to the document..." or "As stated in the context..." when applicable
 4. If information is not available in the context, state that clearly
-5. Make your answers comprehensive by including the supporting context/evidence within the answer itself
+5. Make your answers comprehensive by including the supporting context/evidence within the answer itself whenever possible
 
 Return the response in this exact JSON format:
 {{
@@ -284,6 +321,7 @@ Example answer format: "According to the document, [specific quote from context]
             "raw_llm_response": response,
             "cleaned_response": cleaned_response,
             "parsed_successfully": isinstance(answers, list) and len(answers) > 0,
+            "neighbor_expansion_enabled": True,
             "timing": {
                 "context_retrieval": context_time,
                 "llm_generation": llm_time,
