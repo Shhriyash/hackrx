@@ -7,6 +7,8 @@ import re
 import json
 import time
 import logging
+import tempfile
+import os
 from itertools import accumulate
 from typing import List, Dict, Any, Optional
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -16,7 +18,7 @@ from google.genai import types
 import httpx
 
 # For simple text extraction
-import PyPDF2
+import fitz  # PyMuPDF - much faster than pymupdf4llm
 from docx import Document
 import io
 from pathlib import Path
@@ -322,7 +324,7 @@ class SimpleTextProcessor(DocumentProcessor):
     
     def _extract_pdf_text(self, pdf_data: bytes) -> str:
         """
-        Extract text from PDF data using PyPDF2.
+        Extract text from PDF data using PyMuPDF.
         
         Args:
             pdf_data: PDF file content as bytes
@@ -330,38 +332,51 @@ class SimpleTextProcessor(DocumentProcessor):
         Returns:
             Extracted text content
         """
-        logger.info("Extracting text from PDF using PyPDF2...")
+        logger.info("Extracting text from PDF using PyMuPDF...")
         start_time = time.time()
         
         try:
-            # Create PDF reader from bytes
-            pdf_file = io.BytesIO(pdf_data)
-            pdf_reader = PyPDF2.PdfReader(pdf_file)
+            # Create a temporary file since fitz needs a file path or BytesIO for stream
+            with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp_file:
+                temp_file.write(pdf_data)
+                temp_file_path = temp_file.name
             
-            # Extract text from all pages
-            text_parts = []
-            for page_num, page in enumerate(pdf_reader.pages):
-                try:
-                    page_text = page.extract_text()
+            try:
+                # Open PDF with PyMuPDF
+                doc = fitz.open(temp_file_path)
+                
+                text_parts = []
+                page_count = len(doc)
+                
+                for page_num in range(page_count):
+                    page = doc.load_page(page_num)
+                    page_text = page.get_text()
                     if page_text.strip():
-                        text_parts.append(f"--- Page {page_num + 1} ---\n{page_text}")
-                except Exception as e:
-                    logger.warning(f"Failed to extract text from page {page_num + 1}: {e}")
-                    continue
-            
-            extracted_text = "\n\n".join(text_parts)
-            extract_time = time.time() - start_time
-            logger.info(f"PDF text extraction completed in {extract_time:.3f}s - {len(pdf_reader.pages)} pages processed")
-            
-            if not extracted_text.strip():
-                raise ValueError("No text could be extracted from PDF. The PDF might contain only images or scanned content.")
-            
-            return extracted_text
+                        # Keep the "--- Page X ---" format for compatibility
+                        text_parts.append(f"--- Page {page_num + 1} ---\n{page_text.strip()}")
+                
+                doc.close()
+                
+                extracted_text = "\n\n".join(text_parts)
+                extract_time = time.time() - start_time
+                logger.info(f"PDF text extraction completed in {extract_time:.3f}s - {page_count} pages processed")
+                
+                if not extracted_text.strip():
+                    raise ValueError("No text could be extracted from PDF. The PDF might contain only images or scanned content.")
+                
+                return extracted_text
+                
+            finally:
+                # Clean up temporary file
+                try:
+                    os.unlink(temp_file_path)
+                except OSError:
+                    pass
             
         except Exception as e:
             extract_time = time.time() - start_time
             logger.error(f"PDF text extraction failed after {extract_time:.3f}s: {e}")
-            raise ValueError(f"Failed to extract text from PDF: {e}")
+            raise ValueError(f"Failed to extract text from PDF using PyMuPDF: {e}")
     
     def _extract_docx_text(self, docx_data: bytes) -> str:
         """

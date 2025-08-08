@@ -6,8 +6,8 @@ for generating responses in the RAG pipeline.
 """
 
 from typing import Optional
-import google.generativeai as genai
-
+from google import genai
+from google.genai import types
 from ..interfaces import LanguageModel
 
 
@@ -27,12 +27,11 @@ class GeminiLanguageModel(LanguageModel):
             api_key: Google API key for Gemini
             model_name: Name of the Gemini model to use
         """
-        self.api_key = api_key
         self.model_name = model_name
         
         # Configure the API
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel(model_name)
+        self.client = genai.Client(api_key=api_key)
+        self.model = model_name
     
     def generate_response(self, prompt: str) -> str:
         """
@@ -48,7 +47,14 @@ class GeminiLanguageModel(LanguageModel):
             Exception: If the API call fails
         """
         try:
-            response = self.model.generate_content(prompt)
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    thinking_config=types.ThinkingConfig(thinking_budget=0,
+                                                         include_thoughts=False)
+                )
+            )
             return response.text
         except Exception as e:
             raise Exception(f"Error generating response with Gemini: {str(e)}")

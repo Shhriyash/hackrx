@@ -2,7 +2,7 @@
 FastAPI application for HackRX document processing and question answering.
 
 This application processes PDF documents from URLs and answers multiple questions
-using a RAG pipeline with Gemini Flash and Cohere embeddings.
+using a RAG pipeline with Gemini Flash and dual embedding providers (Cohere/Google).
 """
 
 import os
@@ -17,7 +17,7 @@ import uvicorn
 
 # from src.document_processing import GeminiFlashProcessor
 from src.document_processing import SimpleTextProcessor
-from src.embeddings import CohereEmbeddingProvider
+from src.embeddings import get_embedding_provider
 from src.vector_store import FAISSVectorStore
 from src.llm import GeminiLanguageModel
 
@@ -77,22 +77,24 @@ class RAGPipeline:
     def __init__(self):
         """Initialize the RAG pipeline components."""
         # Initialize components
+        # Use optimized document processor for better performance
         # self.document_processor = GeminiFlashProcessor(
         #     api_key=os.getenv("GOOGLE_API_KEY"),
         #     chunk_size=800,
         #     chunk_overlap=100
         # )
-        self.document_processor = SimpleTextProcessor(chunk_size=2000, chunk_overlap=200)
-
-
-        self.embedding_provider = CohereEmbeddingProvider(
-            api_key=os.getenv("COHERE_API_KEY"),
-            model_name="embed-english-v3.0",
-            input_type="search_document"
+        # OPTIMIZATION: Balanced chunk size for optimal performance and context
+        self.document_processor = SimpleTextProcessor(
+            chunk_size=2048,  
+            chunk_overlap=204 
         )
+
+        # Manual provider selection - change "cohere" to "google" as needed
+        provider_type = os.getenv("EMBEDDING_PROVIDER", "google") 
+        self.embedding_provider = get_embedding_provider(provider_type)
         
         self.vector_store = FAISSVectorStore(
-            dimension=1024,  # Cohere embed-english-v3.0 produces 1024-dimensional embeddings
+            dimension=self.embedding_provider.dimension,  # Dynamic dimension based on provider
             persist_directory=None  # In-memory for this demo
         )
         
@@ -151,11 +153,14 @@ class RAGPipeline:
         texts = [chunk["content"] for chunk in chunks]
         ids = [chunk["chunk_id"] for chunk in chunks]
         
-        # Generate embeddings
+        # Generate embeddings with parallel processing
         embed_start = time.time()
+        logger.info(f"Starting parallel embedding generation for {len(texts)} chunks using {self.embedding_provider.provider_name}")
         embeddings = self.embedding_provider.get_embeddings(texts)
         embed_time = time.time() - embed_start
-        logger.info(f"Generated embeddings in {embed_time:.2f} seconds")
+        
+        processing_rate = len(texts) / embed_time if embed_time > 0 else 0
+        logger.info(f"Parallel embedding generation completed in {embed_time:.2f}s ({processing_rate:.1f} chunks/sec)")
         
         # Store in vector database
         store_start = time.time()
@@ -171,9 +176,22 @@ class RAGPipeline:
         """Retrieve relevant context for a query with neighboring chunks."""
         start_time = time.time()
         
-        # Generate query embedding
+        # Generate query embedding using optimized method
         query_embed_start = time.time()
-        query_embedding = self.embedding_provider.get_embeddings([query])[0]
+        # Use get_query_embedding for RETRIEVAL_QUERY task type optimization
+        if hasattr(self.embedding_provider, 'get_query_embedding'):
+            query_embedding = self.embedding_provider.get_query_embedding(query)
+        else:
+            # Fallback: use get_embeddings with RETRIEVAL_QUERY task type
+            if hasattr(self.embedding_provider, 'get_embeddings'):
+                # Check if get_embeddings supports task_type parameter
+                try:
+                    query_embedding = self.embedding_provider.get_embeddings([query], task_type="RETRIEVAL_QUERY")[0]
+                except TypeError:
+                    # Fallback for providers without task_type parameter
+                    query_embedding = self.embedding_provider.get_embeddings([query])[0]
+            else:
+                query_embedding = self.embedding_provider.get_embeddings([query])[0]
         query_embed_time = time.time() - query_embed_start
         
         # Search vector store for top-k chunks
@@ -218,19 +236,56 @@ class RAGPipeline:
         return contexts
     
     def answer_questions(self, questions: List[str]) -> List[str]:
-        """Answer multiple questions using retrieved context."""
+        """Answer multiple questions using retrieved context with optimized batching."""
         start_time = time.time()
         logger.info(f"Starting to answer {len(questions)} questions")
         
-        # Collect all contexts for all questions
+        # OPTIMIZATION 1: Batch generate all query embeddings at once with parallel processing
+        embed_start = time.time()
+        if hasattr(self.embedding_provider, 'get_query_embeddings'):
+            # Use parallel query embedding processing (MAJOR OPTIMIZATION)
+            query_embeddings = self.embedding_provider.get_query_embeddings(questions)
+        elif hasattr(self.embedding_provider, 'get_query_embedding'):
+            # Fallback: Use single query method in loop (slower)
+            query_embeddings = []
+            for question in questions:
+                query_embeddings.append(self.embedding_provider.get_query_embedding(question))
+        else:
+            # Fallback: Batch process all questions with RETRIEVAL_DOCUMENT task type
+            query_embeddings = self.embedding_provider.get_embeddings(questions)
+        embed_time = time.time() - embed_start
+        logger.info(f"Generated {len(query_embeddings)} query embeddings in {embed_time:.2f} seconds (parallel processing)")
+        
+        # OPTIMIZATION 2: Retrieve contexts for all questions efficiently
+        context_start = time.time()
         all_contexts = []
         question_contexts = {}
         
-        context_start = time.time()
-        for i, question in enumerate(questions):
-            contexts = self.retrieve_context(question, top_k=7)
+        for i, (question, query_embedding) in enumerate(zip(questions, query_embeddings)):
+            # Use pre-computed embedding for vector search
+            search_start = time.time()
+            results = self.vector_store.search(query_embedding, top_k=7)
+            
+            # Expand with neighboring chunks (same logic as before)
+            expanded_indices = set()
+            for result in results:
+                seq_idx = int(result["metadata"]["chunk_id"][6:])
+                expanded_indices.add(seq_idx)
+                if seq_idx - 1 >= 0:
+                    expanded_indices.add(seq_idx - 1)
+                if seq_idx + 1 < self.total_chunks:
+                    expanded_indices.add(seq_idx + 1)
+            
+            # Get contexts in document order
+            sorted_indices = sorted(expanded_indices)
+            contexts = []
+            for idx in sorted_indices:
+                if idx in self.chunk_lookup:
+                    contexts.append(self.chunk_lookup[idx]["content"])
+            
             question_contexts[i] = contexts
             all_contexts.extend(contexts)
+        
         context_time = time.time() - context_start
         
         # Remove duplicates while preserving order
