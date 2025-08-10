@@ -55,106 +55,56 @@ Implements high-performance document handling through:
 
 ```mermaid
 graph TB
-    A[Client Request] --> B[Security Middleware]
-    B --> C{Authentication Check}
-    C -->|Valid| D[Rate Limiting]
-    C -->|Invalid| E[Auth Failure Log]
-    E --> F[IP Monitoring]
-    F --> G[Block Suspicious IPs]
+    A[Client Request] --> B[Security Check]
+    B --> C{Cache Check<br/>Filename-based}
     
-    D --> H[Document URL Processing]
-    H --> I{Filename-Based Cache Check}
-    I -->|Cache Hit| J[Load Cached Data<br/>4-5 seconds]
-    I -->|Cache Miss| K[Document Processing Pipeline<br/>⏱️ 60-90 seconds]
+    C -->|Hit| D[Load from Cache<br/>3.98s]
+    C -->|Miss| E[Process Document<br/>60-90s]
     
-    K --> L[PDF Download & Parse]
-    L --> M[Intelligent Chunking]
-    M --> N[Parallel Embedding Generation]
-    N --> O[Vector Store Indexing]
-    O --> P[Persistent Cache Storage]
+    E --> F[PyMuPDF PDF Extraction]
+    D --> G[Query Processing]
+    F --> H[Text Chunking 2048/204]
     
-    J --> Q[Query Processing Engine]
-    P --> Q
-    Q --> R[Parallel Similarity Search]
-    R --> S[Context Retrieval & Ranking]
-    S --> T[LLM Response Generation]
-    T --> U[Response Assembly]
+    H --> I[Google Embeddings<br/>gemini-001 - 15 Workers]
+    I --> J[FAISS Vector Store<br/>768 dimensions]
+    J --> K[Save to Cache]
     
-    U --> V[Audit Logging]
-    V --> W[Performance Metrics]
-    W --> X[Client Response]
+    K --> G
+    G --> L[FAISS Parallel Search]
+    L --> M[Gemini 2.5 Pro Response]
+    M --> N[Final Response]
     
-    Y[Cache Management] --> Z[Size Monitoring]
-    Z --> AA[Cleanup & Optimization]
-    AA --> BB[Statistics Reporting]
-    
-    subgraph "Parallel Processing Layer"
-        N
-        R
-        direction TB
-        N1[Embedding Batch 1] --> N2[Embedding Batch 2]
-        N2 --> N3[Embedding Batch N]
-        R1[Search Dimension 1] --> R2[Search Dimension 2]
-        R2 --> R3[Search Dimension N]
-    end
-    
-    subgraph "Security Layer"
-        B
-        C
-        D
-        E
-        F
-        G
-    end
-    
-    subgraph "Cache System"
-        I
-        J
-        P
-        Y
-        Z
-        AA
-        BB
-    end
-    
-    style J fill:#e8f5e8,stroke:#4caf50,stroke-width:2px
-    style K fill:#fff3e0,stroke:#ff9800,stroke-width:2px
-    style N fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
-    style R fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
-    style B fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
+    style D fill:#e8f5e8,stroke:#4caf50,stroke-width:3px
+    style E fill:#fff3e0,stroke:#ff9800,stroke-width:3px
+    style I fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
+    style L fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
 ```
 
-### Data Flow Process Breakdown
+### Process Flow Overview
 
-#### **Security & Authentication Layer**
-1. **Request Reception**: Client requests processed through FastAPI endpoints
-2. **Authentication**: API key validation with bearer token support
-3. **Rate Limiting**: 300 requests/5min window with 50 burst capacity
-4. **IP Monitoring**: Automatic blocking after 5 failed attempts
-5. **Audit Logging**: Comprehensive request tracking and security events
+The HackRX RAG system follows a streamlined process:
 
-#### **Cache-First Processing**
-1. **URL Normalization**: Extract filename from document URL
-2. **Cache Key Generation**: SHA256 hash of normalized filename
-3. **Cache Lookup**: Check persistent pickle-based cache storage
-4. **Cache Hit Path**: Load pre-processed chunks and embeddings (4-5 seconds)
-5. **Cache Miss Path**: Full document processing pipeline (60-90 seconds)
+1. **Request & Security**: Client request passes through authentication and rate limiting
+2. **Cache Decision**: Filename-based cache check determines processing path
+3. **Fast Path (Cache Hit)**: Load pre-processed document in 3.98 seconds
+4. **Slow Path (Cache Miss)**: Complete document processing pipeline
+   - PyMuPDF extracts text from PDF
+   - Text chunked into 2048-character segments with 204 overlap
+   - Google gemini-embedding-001 generates 768-dimensional embeddings using 15 ThreadPool workers
+   - FAISS vector store indexes the embeddings
+   - Results saved to persistent cache
+5. **Query Processing**: Both paths converge for question answering
+   - FAISS performs parallel similarity search
+   - Gemini 2.5 Pro generates contextual responses
+   - Final response returned to client
 
-#### **Parallel Document Processing**
-1. **PDF Download**: Secure document retrieval with validation
-2. **PyMuPDF Text Extraction**: Fast PDF parsing for both local and remote files
-3. **Intelligent Chunking**: 2048 character chunks with 204 overlap for optimal context
-4. **ThreadPool Embedding**: 15 workers processing Google gemini-embedding-001 embeddings
-5. **FAISS Vector Indexing**: High-performance similarity search preparation
-6. **Persistent Cache Storage**: Filename-based cache with automatic compression
-
-#### **Query Processing Engine**
-1. **Query Analysis**: Natural language processing and optimization
-2. **FAISS Parallel Search**: Concurrent similarity searches across 768-dimensional vectors
-3. **Context Retrieval**: Relevance scoring and neighbor analysis
-4. **Result Ranking**: Multi-factor scoring with confidence metrics
-5. **Gemini Flash 2.5 Generation**: Context-aware response generation
-6. **Response Assembly**: Structured output with metadata and timing
+**Key Technologies Used:**
+- **Cache**: Filename-based persistent storage (15-23x speedup)
+- **Document Processing**: PyMuPDF for fast PDF extraction
+- **Embeddings**: Google gemini-embedding-001 with ThreadPoolExecutor
+- **Vector Search**: FAISS with 768-dimensional vectors
+- **LLM**: Gemini 2.5 Pro for response generation
+- **Performance**: 3.98s average response time with caching
 
 ## Future Enhancements
 
