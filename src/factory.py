@@ -1,10 +1,8 @@
 """
 Factory module for creating RAG pipeline components.
 
-Factory Pattern Rationale: Centralizes component creation and configuration
-to ensure consistent setup across the application. This pattern makes it
-easy to swap implementations (e.g., different embedding providers) without
-changing dependent code throughout the system.
+This module provides factory classes that create and configure
+the various components of the RAG system based on configuration.
 """
 
 import os
@@ -23,10 +21,8 @@ class RAGFactory:
     """
     Factory class for creating and configuring RAG pipeline components.
     
-    Component Creation Strategy: Each factory method handles the specific
-    configuration and initialization logic for its component type. This
-    centralization prevents scattered configuration logic and ensures
-    all components are properly initialized with correct dependencies.
+    This factory provides methods to create properly configured instances
+    of all RAG system components based on configuration settings.
     """
     
     @staticmethod

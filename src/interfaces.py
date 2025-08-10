@@ -1,10 +1,9 @@
 """
 Base interfaces for the RAG system components.
 
-Interface Design Rationale: Abstract base classes provide contracts that ensure
-all implementations follow the same API. This enables easy swapping of providers
-(e.g., switching from Cohere to OpenAI embeddings) without changing dependent code.
-The interface pattern also facilitates testing with mock implementations.
+This module defines abstract base classes that ensure interchangeability
+of different implementations for document processing, embeddings, vector stores,
+and language models.
 """
 
 from abc import ABC, abstractmethod

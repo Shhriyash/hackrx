@@ -1,15 +1,8 @@
 """
 FastAPI application for HackRX document processing and question answering.
 
-Architecture Decision: Uses RAG (Retrieval-Augmented Generation) pipeline with 
-filename-based caching to process PDF documents efficiently. The cache-first 
-approach provides 10-20x performance improvement for previously processed documents.
-
-Key Features:
-- Dual embedding providers (Cohere/Google) for better retrieval accuracy
-- Persistent document cache using filename-based keys for cross-session efficiency  
-- Security middleware with API key validation and rate limiting
-- Comprehensive audit logging for production monitoring
+This application processes PDF documents from URLs and answers multiple questions
+using a RAG pipeline with Gemini Flash and dual embedding providers (Cohere/Google).
 """
 
 import os
@@ -24,9 +17,7 @@ from pydantic import BaseModel, HttpUrl
 # Import security middleware
 import sys
 sys.path.append('g:/dem/hackrx')
-# Security middleware provides API key validation and rate limiting
-# to protect against unauthorized access and abuse in production
-from security_middleware import security_middleware, validate_api_key, record_auth_failure, get_security_stats
+from security_middleware import security_middleware, record_auth_failure, get_security_stats
 import uvicorn
 
 # from src.document_processing import GeminiFlashProcessor
@@ -34,7 +25,6 @@ from src.document_processing import SimpleTextProcessor
 from src.embeddings import get_embedding_provider
 from src.vector_store import FAISSVectorStore
 from src.llm import GeminiLanguageModel
-from src.cache_manager import get_document_cache
 
 from dotenv import load_dotenv
 load_dotenv(override=True)  # Load environment variables from .env file
@@ -128,7 +118,7 @@ class RAGPipeline:
         
         self.language_model = GeminiLanguageModel(
             api_key=os.getenv("GOOGLE_API_KEY"),
-            model_name="gemini-2.5-flash" 
+            model_name="gemini-2.5-pro" 
         )
         
         # Configuration for parallel processing
@@ -140,64 +130,15 @@ class RAGPipeline:
         if self.enable_parallel_processing:
             logger.info(f"Max workers - Context: {self.max_context_workers}, LLM: {self.max_llm_workers}")
         
-        # Initialize document cache
-        self.document_cache = get_document_cache()
-        logger.info("Document cache initialized for fast repeated document processing")
-        
         # For neighbor chunk lookup
         self.chunk_lookup = {}  # {sequence_index: chunk_data}
         self.total_chunks = 0   # Total number of chunks for boundary checks
     
     def process_document(self, document_url: str) -> List[Dict[str, Any]]:
-        """
-        Process a document and return chunks, using cache-first approach.
-        
-        Cache-first Strategy: Always check cache before processing to avoid
-        expensive PDF parsing and chunking operations. This provides 10-20x
-        performance improvement for previously processed documents.
-        """
+        """Process a document and return chunks."""
         start_time = time.time()
         logger.info(f"Starting document processing for URL: {document_url}")
         
-        # Check if document is cached first (cache-first approach for performance)
-        if self.document_cache.is_cached(document_url):
-            logger.info("Document found in cache - retrieving cached data")
-            cached_data = self.document_cache.get_cached_data(document_url)
-            if cached_data:
-                # Restore chunks and lookup
-                chunks = cached_data["chunks"]
-                self.chunk_lookup = cached_data["chunk_lookup"]
-                self.total_chunks = len(chunks)
-                
-                # Log cache hit performance
-                cache_time = time.time() - start_time
-                logger.info(f"CACHE HIT: Document loaded from cache in {cache_time:.3f}s")
-                logger.info(f"Cache saved: {cached_data['metadata']['processing_time']:.2f}s processing time")
-                logger.info(f"Performance gain: {((cached_data['metadata']['processing_time'] - cache_time) / cached_data['metadata']['processing_time'] * 100):.1f}% faster")
-                
-                # Store processing info for audit (mark as cached)
-                self._last_doc_processing_info = {
-                    "document_url": document_url,
-                    "chunk_count": len(chunks),
-                    "processing_time": cache_time,
-                    "cached": True,
-                    "original_processing_time": cached_data['metadata']['processing_time'],
-                    "chunks_preview": [
-                        {
-                            "chunk_id": chunk.get("chunk_id", "unknown"),
-                            "sequence_index": chunk.get("sequence_index", "unknown"),
-                            "page_number": chunk.get("page_number", "unknown"),
-                            "content_length": len(chunk.get("content", "")),
-                            "content_preview": chunk.get("content", "")
-                        }
-                        for chunk in chunks[:5]  # Preview first 5 chunks only
-                    ]
-                }
-                
-                return chunks
-        
-        # Cache miss: Process document from scratch using expensive PDF parsing
-        logger.info("Document not in cache - processing from scratch")
         chunks = self.document_processor.process_document(document_url)
         
         # Add sequence_index to each chunk for neighbor retrieval
@@ -212,7 +153,6 @@ class RAGPipeline:
             "document_url": document_url,
             "chunk_count": len(chunks),
             "processing_time": processing_time,
-            "cached": False,
             "chunks_preview": [
                 {
                     "chunk_id": chunk.get("chunk_id", "unknown"),
@@ -228,13 +168,7 @@ class RAGPipeline:
         return chunks
     
     def index_chunks(self, chunks: List[Dict[str, Any]]) -> None:
-        """
-        Index document chunks in the vector store, using cached embeddings if available.
-        
-        Embedding Cache Strategy: Embedding generation is computationally expensive
-        (especially for large documents). We cache embeddings alongside chunks to
-        avoid regenerating them for the same document, providing significant speedup.
-        """
+        """Index document chunks in the vector store."""
         start_time = time.time()
         logger.info(f"Starting indexing of {len(chunks)} chunks")
         
@@ -242,38 +176,11 @@ class RAGPipeline:
         self.total_chunks = len(chunks)
         self.chunk_lookup = {chunk["sequence_index"]: chunk for chunk in chunks}
         
-        # Check if this document was loaded from cache (embedding reuse optimization)
-        if hasattr(self, '_last_doc_processing_info') and self._last_doc_processing_info.get('cached', False):
-            # Document was cached, retrieve cached embeddings to skip expensive generation
-            document_url = self._last_doc_processing_info['document_url']
-            cached_data = self.document_cache.get_cached_data(document_url)
-            
-            if cached_data and 'embeddings' in cached_data:
-                logger.info("Using cached embeddings - skipping embedding generation")
-                
-                # Extract text content and IDs
-                texts = [chunk["content"] for chunk in chunks]
-                ids = [chunk["chunk_id"] for chunk in chunks]
-                embeddings = cached_data['embeddings']
-                
-                # Store in vector database directly
-                store_start = time.time()
-                self.vector_store.add_documents(texts, embeddings, chunks, ids)
-                store_time = time.time() - store_start
-                
-                total_time = time.time() - start_time
-                logger.info(f"Cached indexing completed in {total_time:.2f} seconds (embedding generation skipped)")
-                logger.info(f"Vector store updated in {store_time:.2f} seconds")
-                return
-        
-        # Cache miss: Generate embeddings from scratch (computationally expensive)
-        logger.info("Generating new embeddings...")
-        
         # Extract text content
         texts = [chunk["content"] for chunk in chunks]
         ids = [chunk["chunk_id"] for chunk in chunks]
         
-        # Generate embeddings with parallel processing for performance
+        # Generate embeddings with parallel processing
         embed_start = time.time()
         logger.info(f"Starting parallel embedding generation for {len(texts)} chunks using {self.embedding_provider.provider_name}")
         embeddings = self.embedding_provider.get_embeddings(texts)
@@ -287,21 +194,6 @@ class RAGPipeline:
         self.vector_store.add_documents(texts, embeddings, chunks, ids)
         store_time = time.time() - store_start
         logger.info(f"Stored embeddings in vector store in {store_time:.2f} seconds")
-        
-        # Cache the document data for future use
-        if hasattr(self, '_last_doc_processing_info') and not self._last_doc_processing_info.get('cached', False):
-            document_url = self._last_doc_processing_info['document_url']
-            processing_time = self._last_doc_processing_info['processing_time']
-            
-            logger.info(f"Caching document data for future requests...")
-            self.document_cache.cache_document(
-                document_url=document_url,
-                chunks=chunks,
-                embeddings=embeddings,
-                chunk_lookup=self.chunk_lookup,
-                processing_time=processing_time
-            )
-            logger.info(f"Document cached successfully for URL: {document_url}")
         
         total_time = time.time() - start_time
         logger.info(f"Total indexing completed in {total_time:.2f} seconds")
@@ -765,11 +657,7 @@ async def process_hackrx_request(
     token: str = Depends(verify_auth_token)
 ):
     """
-    Main endpoint for document processing and question answering.
-    
-    Architecture: Cache-first RAG pipeline that checks for cached documents
-    before processing. This approach reduces response time from 60-90 seconds
-    to 4-5 seconds for previously processed documents.
+    Process a document and answer questions.
     
     Args:
         request: The request containing document URL and questions
@@ -928,78 +816,6 @@ async def health_check():
     """Health check endpoint."""
     return {"status": "healthy", "message": "HackRX API is running"}
 
-@app.get("/cache/stats")
-async def get_cache_stats(x_api_key: str = Header(...)):
-    """Get document cache statistics."""
-    validate_api_key(x_api_key)
-    
-    try:
-        cache = get_document_cache()
-        stats = cache.get_cache_stats()
-        return {
-            "status": "success",
-            "cache_stats": stats
-        }
-    except Exception as e:
-        logger.error(f"Error getting cache stats: {e}")
-        raise HTTPException(status_code=500, detail=f"Error getting cache stats: {str(e)}")
-
-@app.get("/cache/documents")
-async def list_cached_documents(x_api_key: str = Header(...)):
-    """List all cached documents."""
-    validate_api_key(x_api_key)
-    
-    try:
-        cache = get_document_cache()
-        documents = cache.list_cached_documents()
-        return {
-            "status": "success",
-            "cached_documents": documents,
-            "total_count": len(documents)
-        }
-    except Exception as e:
-        logger.error(f"Error listing cached documents: {e}")
-        raise HTTPException(status_code=500, detail=f"Error listing cached documents: {str(e)}")
-
-@app.delete("/cache/clear")
-async def clear_cache(x_api_key: str = Header(...)):
-    """Clear all cached documents."""
-    validate_api_key(x_api_key)
-    
-    try:
-        cache = get_document_cache()
-        cache.clear_cache()
-        return {
-            "status": "success",
-            "message": "Cache cleared successfully"
-        }
-    except Exception as e:
-        logger.error(f"Error clearing cache: {e}")
-        raise HTTPException(status_code=500, detail=f"Error clearing cache: {str(e)}")
-
-@app.delete("/cache/documents/{document_url:path}")
-async def remove_cached_document(document_url: str, x_api_key: str = Header(...)):
-    """Remove a specific document from cache."""
-    validate_api_key(x_api_key)
-    
-    try:
-        cache = get_document_cache()
-        removed = cache.remove_document(document_url)
-        
-        if removed:
-            return {
-                "status": "success",
-                "message": f"Document removed from cache: {document_url}"
-            }
-        else:
-            return {
-                "status": "not_found",
-                "message": f"Document not found in cache: {document_url}"
-            }
-    except Exception as e:
-        logger.error(f"Error removing cached document: {e}")
-        raise HTTPException(status_code=500, detail=f"Error removing cached document: {str(e)}")
-
 
 @app.get("/")
 async def root():
@@ -1041,13 +857,13 @@ async def get_security_status(token: str = Depends(verify_auth_token)):
         "timestamp": datetime.now().isoformat(),
         "statistics": get_security_stats(),
         "features": {
-            "rate_limiting": "ACTIVE: 300 req/5min (60/min sustained) + 50 burst/min",
-            "authentication": "ACTIVE: Bearer token required",
-            "ip_monitoring": "ACTIVE: Suspicious IP detection & blocking",
-            "request_logging": "ACTIVE: All requests logged with IP tracking",
-            "security_headers": "ACTIVE: XSS, CSRF, content-type protection",
-            "ssl_support": "READY: HTTPS/TLS ready (cert required)",
-            "production_ready": "ACTIVE: High-throughput optimized"
+            "rate_limiting": "✅ 300 req/5min (60/min sustained) + 50 burst/min",
+            "authentication": "✅ Bearer token required",
+            "ip_monitoring": "✅ Suspicious IP detection & blocking",
+            "request_logging": "✅ All requests logged with IP tracking",
+            "security_headers": "✅ XSS, CSRF, content-type protection",
+            "ssl_support": "✅ HTTPS/TLS ready (cert required)",
+            "production_ready": "✅ High-throughput optimized"
         }
     }
 
