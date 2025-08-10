@@ -96,11 +96,6 @@ class RAGPipeline:
         """Initialize the RAG pipeline components."""
         # Initialize components
         # Use optimized document processor for better performance
-        # self.document_processor = GeminiFlashProcessor(
-        #     api_key=os.getenv("GOOGLE_API_KEY"),
-        #     chunk_size=800,
-        #     chunk_overlap=100
-        # )
         # OPTIMIZATION: Balanced chunk size for optimal performance and context
         self.document_processor = SimpleTextProcessor(
             chunk_size=2048,  
@@ -857,13 +852,13 @@ async def get_security_status(token: str = Depends(verify_auth_token)):
         "timestamp": datetime.now().isoformat(),
         "statistics": get_security_stats(),
         "features": {
-            "rate_limiting": "✅ 300 req/5min (60/min sustained) + 50 burst/min",
-            "authentication": "✅ Bearer token required",
-            "ip_monitoring": "✅ Suspicious IP detection & blocking",
-            "request_logging": "✅ All requests logged with IP tracking",
-            "security_headers": "✅ XSS, CSRF, content-type protection",
-            "ssl_support": "✅ HTTPS/TLS ready (cert required)",
-            "production_ready": "✅ High-throughput optimized"
+            "rate_limiting": "300 req/5min (60/min sustained) + 50 burst/min",
+            "authentication": "Bearer token required",
+            "ip_monitoring": "Suspicious IP detection & blocking",
+            "request_logging": "All requests logged with IP tracking",
+            "security_headers": "XSS, CSRF, content-type protection",
+            "ssl_support": "HTTPS/TLS ready (cert required)",
+            "production_ready": "High-throughput optimized"
         }
     }
 

@@ -2,7 +2,7 @@
 
 A high-performance Retrieval Augmented Generation (RAG) system with intelligent caching and parallel processing for document analysis and question answering.
 
-## 📄 Detailed Solution Description
+## Detailed Solution Description
 
 The HackRX RAG System is a production-grade document processing and question-answering platform that revolutionizes how organizations handle document-based queries. Built from the ground up with performance and scalability in mind, our solution addresses the critical challenge of processing large volumes of documents efficiently while maintaining high-quality responses.
 
@@ -22,36 +22,36 @@ We've engineered a sophisticated system that combines:
 4. **Persistent Cache System**: Pickle-based serialization ensuring cache survives server restarts
 5. **Modular Architecture**: Interchangeable components for embeddings, document processing, and language models
 
-## 💡 What Makes Our Solution Unique
+## What Makes Our Solution Unique
 
 ### 1. **Revolutionary Filename-Based Caching**
 Unlike traditional RAG systems that cache based on URLs (which break with changing SAS tokens), our system extracts and normalizes filenames to create persistent cache keys. This innovation alone provides:
-- **10-20x Performance Improvement**: 4-5 seconds vs 60-90 seconds
+- **10-20x Performance Improvement**: Average 3.98 seconds vs 60-90 seconds
 - **Cross-Session Persistence**: Cache works across server restarts
 - **URL Independence**: Same document cached regardless of access method
 
-### 2. **Advanced Parallel Processing Architecture**
-Our system implements parallelization at multiple levels:
-- **Embedding Generation**: Batch processing with configurable thread pools
-- **Similarity Search**: Concurrent vector operations across dimensions
-- **Query Processing**: Parallel context retrieval and ranking
-- **Resource Optimization**: Intelligent load balancing and memory management
+### 2. **Advanced Parallel Processing with Google Embeddings**
+Our system implements ThreadPoolExecutor-based parallelization to overcome Google's embedding API limitations:
+- **15 Worker Threads**: Optimized for Google's gemini-embedding-001 model
+- **768-Dimension Embeddings**: Latest multimodal embedding model
+- **Chunked Processing**: 2048 character chunks with 204 overlap for optimal context
+- **No Batching Limitation**: ThreadPoolExecutor overcomes Google's single-request constraint
 
 ### 3. **Production-First Design Philosophy**
 Built for enterprise deployment from day one:
+- **SSL Certificates**: Implemented HTTPS/TLS security
+- **Ngrok Tunneling**: Built-in tunneling for both development and production
 - **Security Middleware**: Multi-layer protection with API keys, rate limiting, IP blocking
-- **Comprehensive Monitoring**: Request tracking, performance metrics, cache analytics
-- **Scalable Configuration**: Environment-based settings for different deployment scenarios
-- **Error Resilience**: Graceful degradation and automatic retry mechanisms
+- **Provider Flexibility**: Manual switching between Google and Cohere via environment variables
 
-### 4. **Dual Provider Strategy**
-Implements redundancy and optimization through:
-- **Multiple Embedding Providers**: Cohere and Google with automatic failover
-- **Provider Abstraction**: Easy switching between services without code changes
-- **Performance Benchmarking**: Real-time comparison and selection of optimal providers
-- **Cost Optimization**: Intelligent routing based on document characteristics
+### 4. **Optimized Document Processing Pipeline**
+Implements high-performance document handling through:
+- **PyMuPDF Integration**: Fast PDF text extraction for both local and remote files
+- **Intelligent Chunking**: 2048/204 chunk size optimized for embedding performance
+- **Gemini Flash 2.5**: Advanced language model for question answering
+- **FAISS Vector Store**: High-performance similarity search with 768-dimensional vectors
 
-## 🔁 Data Flow Diagram
+## Data Flow Diagram
 
 ```mermaid
 graph TB
@@ -64,7 +64,7 @@ graph TB
     
     D --> H[Document URL Processing]
     H --> I{Filename-Based Cache Check}
-    I -->|Cache Hit| J[Load Cached Data<br/>⚡ 4-5 seconds]
+    I -->|Cache Hit| J[Load Cached Data<br/>4-5 seconds]
     I -->|Cache Miss| K[Document Processing Pipeline<br/>⏱️ 60-90 seconds]
     
     K --> L[PDF Download & Parse]
@@ -126,61 +126,61 @@ graph TB
 
 ### Data Flow Process Breakdown
 
-#### 🔐 **Security & Authentication Layer**
+#### **Security & Authentication Layer**
 1. **Request Reception**: Client requests processed through FastAPI endpoints
 2. **Authentication**: API key validation with bearer token support
 3. **Rate Limiting**: 300 requests/5min window with 50 burst capacity
 4. **IP Monitoring**: Automatic blocking after 5 failed attempts
 5. **Audit Logging**: Comprehensive request tracking and security events
 
-#### ⚡ **Cache-First Processing**
+#### **Cache-First Processing**
 1. **URL Normalization**: Extract filename from document URL
 2. **Cache Key Generation**: SHA256 hash of normalized filename
 3. **Cache Lookup**: Check persistent pickle-based cache storage
 4. **Cache Hit Path**: Load pre-processed chunks and embeddings (4-5 seconds)
 5. **Cache Miss Path**: Full document processing pipeline (60-90 seconds)
 
-#### 🔄 **Parallel Document Processing**
+#### **Parallel Document Processing**
 1. **PDF Download**: Secure document retrieval with validation
-2. **OCR Processing**: Gemini Flash 2.5 for advanced text extraction
-3. **Intelligent Chunking**: Overlap-aware segmentation with metadata
-4. **Parallel Embedding**: Concurrent batch processing across threads
-5. **Vector Indexing**: FAISS-based similarity search preparation
-6. **Cache Storage**: Persistent storage with automatic compression
+2. **PyMuPDF Text Extraction**: Fast PDF parsing for both local and remote files
+3. **Intelligent Chunking**: 2048 character chunks with 204 overlap for optimal context
+4. **ThreadPool Embedding**: 15 workers processing Google gemini-embedding-001 embeddings
+5. **FAISS Vector Indexing**: High-performance similarity search preparation
+6. **Persistent Cache Storage**: Filename-based cache with automatic compression
 
-#### 🎯 **Query Processing Engine**
+#### **Query Processing Engine**
 1. **Query Analysis**: Natural language processing and optimization
-2. **Parallel Search**: Concurrent similarity searches across vector dimensions
+2. **FAISS Parallel Search**: Concurrent similarity searches across 768-dimensional vectors
 3. **Context Retrieval**: Relevance scoring and neighbor analysis
 4. **Result Ranking**: Multi-factor scoring with confidence metrics
-5. **LLM Generation**: Context-aware response generation with Gemini
+5. **Gemini Flash 2.5 Generation**: Context-aware response generation
 6. **Response Assembly**: Structured output with metadata and timing
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
 ### Phase 1: Advanced Intelligence (Q4 2025)
-- **🧠 Multi-Modal Processing**: Support for images, charts, and tables within documents
-- **🔍 Semantic Query Expansion**: Automatic query enhancement using embeddings
-- **📊 Advanced Analytics**: Real-time performance dashboards and insights
-- **🎯 Smart Caching**: ML-based prediction of cache hit probability
+- **Multi-Modal Processing**: Support for images, charts, and tables within documents
+- **Semantic Query Expansion**: Automatic query enhancement using embeddings
+- **Advanced Analytics**: Real-time performance dashboards and insights
+- **Smart Caching**: ML-based prediction of cache hit probability
 
 ### Phase 2: Enterprise Features (Q1 2026)
-- **👥 Multi-Tenant Architecture**: Isolated document spaces per organization
-- **🔒 Enhanced Security**: SSO integration, role-based access control
-- **📈 Auto-Scaling**: Kubernetes-based horizontal scaling
-- **🌍 Global Distribution**: Multi-region cache synchronization
+- **Multi-Tenant Architecture**: Isolated document spaces per organization
+- **Enhanced Security**: SSO integration, role-based access control
+- **Auto-Scaling**: Kubernetes-based horizontal scaling
+- **Global Distribution**: Multi-region cache synchronization
 
 ### Phase 3: AI-Powered Optimization (Q2 2026)
-- **🤖 Adaptive Learning**: System learns from query patterns to optimize caching
-- **💡 Intelligent Routing**: AI-driven selection of optimal embedding providers
-- **🔄 Dynamic Chunking**: Context-aware document segmentation
-- **📝 Response Quality Scoring**: Automatic evaluation and improvement
+- **Adaptive Learning**: System learns from query patterns to optimize caching
+- **Intelligent Routing**: AI-driven selection of optimal embedding providers
+- **Dynamic Chunking**: Context-aware document segmentation
+- **Response Quality Scoring**: Automatic evaluation and improvement
 
 ### Phase 4: Advanced Integrations (Q3 2026)
-- **🔗 GraphRAG Implementation**: Knowledge graph-based retrieval
-- **🎬 Real-Time Processing**: Streaming document updates and live indexing
-- **🌐 Multi-Language Support**: Cross-language document processing
-- **🔍 Federated Search**: Query across multiple document repositories
+- **GraphRAG Implementation**: Knowledge graph-based retrieval
+- **Real-Time Processing**: Streaming document updates and live indexing
+- **Multi-Language Support**: Cross-language document processing
+- **Federated Search**: Query across multiple document repositories
 
 ### Technical Roadmap
 
@@ -205,12 +205,65 @@ graph TB
 ## Key Features
 
 - **Intelligent Caching**: Filename-based persistent cache providing 10-20x performance improvement
-- **Parallel Processing**: Concurrent embedding generation and query processing for optimal throughput
+- **Parallel Processing**: ThreadPoolExecutor-based embedding generation with 15 workers for optimal throughput
 - **Modular Architecture**: Interchangeable components for document processing, embeddings, vector storage, and language models
-- **Production Ready**: Security middleware, rate limiting, and comprehensive monitoring
-- **Multiple Document Processors**: Support for both local and cloud-based PDF processing
-- **Dual Embedding Providers**: Cohere and Google embeddings with automatic failover
+- **Production Ready**: Security middleware, rate limiting, SSL certificates, and comprehensive monitoring
+- **PyMuPDF Document Processing**: Fast PDF text extraction with optimized chunking (2048 size, 204 overlap)
+- **Google Embedding 001**: Latest multimodal embedding model with 768 dimensions
+- **Cohere Fallback**: Manual provider switching via environment variables
 - **FastAPI Integration**: Production-ready REST API with authentication and audit logging
+- **Ngrok Tunneling**: Built-in tunneling support for both development and production deployment
+
+## Technology Stack
+
+### Core Framework & API
+- **FastAPI**: High-performance web framework for building REST APIs
+- **Uvicorn**: ASGI server for production deployment
+- **Pydantic**: Data validation and serialization using Python type hints
+
+### AI & Machine Learning
+- **Google Generative AI**: 
+  - `gemini-embedding-001`: Latest multimodal embedding model (768 dimensions)
+  - `gemini-2.5-pro`: Advanced language model for response generation
+- **Cohere API**: Fallback embedding provider for redundancy
+
+### Document Processing
+- **PyMuPDF (fitz)**: High-performance PDF text extraction library
+- **python-docx**: Microsoft Word document processing
+- **LangChain Text Splitters**: Intelligent text chunking with overlap support
+
+### Vector Storage & Search
+- **FAISS**: Facebook AI Similarity Search for efficient vector operations
+- **NumPy**: Numerical computing for vector manipulations
+- **Pickle**: Python serialization for persistent cache storage
+
+### Parallel Processing & Performance
+- **ThreadPoolExecutor**: Concurrent execution for Google embedding requests
+- **concurrent.futures**: Asynchronous task management
+- **Optimized Threading**: 15 workers for embedding, 10 for context processing
+
+### Security & Authentication
+- **Custom Security Middleware**: Multi-layer protection implementation
+- **SSL/TLS Certificates**: HTTPS encryption for production deployment
+- **API Key Authentication**: Bearer token validation system
+- **Rate Limiting**: Request throttling and IP monitoring
+
+### Development & Deployment
+- **Python-dotenv**: Environment variable management
+- **Ngrok**: Tunneling service for secure external access
+- **Production Config**: Uvicorn-based production server setup
+- **Logging**: Comprehensive audit trail and performance monitoring
+
+### Data Management
+- **JSON Configuration**: Flexible configuration management
+- **Persistent Caching**: Filename-based cache with pickle serialization
+- **Environment Variables**: Secure configuration and API key management
+
+### Performance Optimization
+- **Filename-based Cache Keys**: Overcomes Azure SAS token limitations
+- **Intelligent Chunking**: 2048 character chunks with 204 overlap
+- **Parallel Similarity Search**: Concurrent FAISS operations
+- **ThreadPool Management**: Optimized worker allocation for API constraints
 
 ## Performance Optimizations
 
@@ -474,12 +527,20 @@ GOOGLE_API_KEY=your_google_api_key
 COHERE_API_KEY=your_cohere_api_key
 API_KEY=your_authentication_api_key
 
-# Optional Performance Tuning
-EMBEDDING_BATCH_SIZE=32
-PARALLEL_WORKERS=4
+# Embedding Provider Selection (Manual Switching)
+EMBEDDING_PROVIDER=google    # Set to "google" or "cohere"
+
+# Performance Tuning
+EMBEDDING_BATCH_SIZE=15      # ThreadPoolExecutor workers
+PARALLEL_WORKERS=10          # Context processing workers
 CACHE_MAX_SIZE_MB=500
 RATE_LIMIT_REQUESTS=300
 RATE_LIMIT_WINDOW=300
+
+# Parallel Processing Configuration
+ENABLE_PARALLEL_QA=true
+MAX_CONTEXT_WORKERS=10
+MAX_LLM_WORKERS=8
 ```
 
 ### Advanced Configuration
@@ -489,11 +550,11 @@ from src.factory import RAGFactory
 from config import RAGConfig
 
 config = RAGConfig.default()
-config.document_processing.chunk_size = 1000
-config.document_processing.chunk_overlap = 200
-config.embedding.provider = "cohere"
-config.embedding.batch_size = 64
-config.vector_store.collection_name = "production_docs"
+config.document_processing.chunk_size = 2048
+config.document_processing.chunk_overlap = 204
+config.embedding.provider = "google"  # or "cohere" for manual switching
+config.embedding.model_name = "gemini-embedding-001"
+config.vector_store.dimension = 768
 
 pipeline = RAGFactory.create_pipeline(config)
 ```
@@ -507,18 +568,44 @@ pip install -r requirements.txt
 
 # 2. Set environment variables
 export GEMINI_API_KEY="your-key"
+export GOOGLE_API_KEY="your-google-key"
+export EMBEDDING_PROVIDER="google"
 export API_KEY="secure-production-key"
 
-# 3. Start production server
+# 3. Start production server with SSL
 python hackrx_api.py
-# Server runs on http://0.0.0.0:8001
+# Server runs on https://0.0.0.0:8001 with SSL certificates
 
-# 4. Optional: Use production config
-python -c "
-from production_config import run_production_server
-from hackrx_api import app
-run_production_server(app)
-"
+# 4. Optional: Use ngrok tunneling
+# Ngrok is built-in for both development and production
+./setup_ngrok.py --port 8001 --domain your-domain.ngrok.io
+```
+
+### SSL Certificate Setup
+The application includes SSL certificate implementation:
+```bash
+# SSL certificates are automatically loaded if present
+# Place your certificates in:
+# - ssl/server.crt (certificate file)
+# - ssl/server.key (private key file)
+
+# The server will automatically use HTTPS if certificates are found
+```
+
+### Ngrok Integration
+```python
+# Built-in ngrok support for tunneling
+from setup_ngrok import setup_tunnel
+
+# Development tunneling
+tunnel_url = setup_tunnel(port=8001, development=True)
+
+# Production tunneling with custom domain
+tunnel_url = setup_tunnel(
+    port=8001, 
+    domain="your-production-domain.ngrok.io",
+    development=False
+)
 ```
 
 ### Docker Deployment
@@ -661,23 +748,26 @@ The HackRX RAG system is built with a cache-first, parallel processing architect
 - **Cache-first Strategy**: Always check cache before expensive processing
 
 #### 2. **Document Processing Pipeline**
-- **PDF Parsing**: Advanced OCR with Gemini Flash 2.5
-- **Intelligent Chunking**: Overlap-aware text segmentation
+- **PyMuPDF Integration**: Fast PDF text extraction for local and remote files
+- **Intelligent Chunking**: 2048 character chunks with 204 overlap for optimal embedding context
 - **Metadata Extraction**: Page numbers, sequence indices, content previews
+- **SimpleTextProcessor**: Optimized for performance without OCR overhead
 
-#### 3. **Parallel Embedding System**
-- **Batch Processing**: Concurrent embedding generation for multiple chunks
-- **Provider Abstraction**: Support for Cohere and Google embeddings
-- **Automatic Failover**: Graceful degradation between providers
-- **Performance Optimization**: Thread pool execution for I/O operations
+#### 3. **Google Embedding System**
+- **ThreadPoolExecutor**: 15 workers handling Google's single-request limitation
+- **Gemini-embedding-001**: Latest multimodal embedding model with 768 dimensions
+- **Manual Provider Switch**: Environment variable control between Google and Cohere
+- **Optimized Performance**: 3.98 second average response time
 
-#### 4. **Vector Store & Retrieval**
-- **FAISS Integration**: High-performance similarity search
-- **Parallel Queries**: Concurrent similarity searches across dimensions
+#### 4. **FAISS Vector Store & Retrieval**
+- **High-Performance Search**: Optimized similarity search across 768-dimensional vectors
+- **Parallel Queries**: Concurrent similarity searches for multiple questions
 - **Context Ranking**: Relevance scoring and neighbor retrieval
 - **Scalable Indexing**: Efficient storage and retrieval patterns
 
 #### 5. **Security & Production Features**
+- **SSL Certificates**: Implemented HTTPS/TLS encryption
+- **Ngrok Tunneling**: Built-in tunneling for development and production deployment
 - **API Key Authentication**: Bearer token validation
 - **Rate Limiting**: 300 requests/5min window with burst support
 - **IP Monitoring**: Automatic blocking after failed attempts
@@ -685,41 +775,44 @@ The HackRX RAG system is built with a cache-first, parallel processing architect
 
 ### Parallel Processing Implementation
 
-#### Embedding Generation Parallelization
+#### Google Embedding Processing
 ```python
-class ParallelEmbeddingProvider:
-    async def get_embeddings(self, texts: List[str]) -> List[List[float]]:
-        # Split texts into optimal batch sizes
-        batches = self._create_batches(texts, batch_size=32)
+class GoogleEmbeddingProvider:
+    def get_embeddings(self, texts: List[str]) -> List[List[float]]:
+        # ThreadPoolExecutor overcomes Google's single-request limitation
+        max_workers = min(15, len(texts))  # Optimized for Google API
         
-        # Process batches concurrently
-        tasks = [self._process_batch(batch) for batch in batches]
-        results = await asyncio.gather(*tasks)
-        
-        # Flatten and return results
-        return [emb for batch_result in results for emb in batch_result]
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Process embeddings with retry logic
+            futures = {executor.submit(self._process_text, text): i 
+                      for i, text in enumerate(texts)}
+            
+            # Collect results maintaining order
+            embeddings = [None] * len(texts)
+            for future in as_completed(futures):
+                index, embedding = future.result()
+                embeddings[index] = embedding
 ```
 
-#### Query Processing Parallelization  
+#### Document Processing Parallelization  
 ```python
-class ParallelRetriever:
-    async def multi_query_search(self, queries: List[str], k: int = 5):
-        # Execute similarity searches concurrently
-        search_tasks = [
-            self.vector_store.similarity_search(query, k=k) 
-            for query in queries
-        ]
-        
-        # Gather results and merge contexts
-        results = await asyncio.gather(*search_tasks)
-        return self._merge_and_rank_results(results)
+class RAGPipeline:
+    def process_multiple_questions(self, questions: List[str]):
+        # Parallel processing for multiple questions in single request
+        with ThreadPoolExecutor(max_workers=self.max_context_workers) as executor:
+            # Process each question concurrently
+            futures = [executor.submit(self._process_question, q) 
+                      for q in questions]
+            
+            # Gather results
+            return [future.result() for future in futures]
 ```
 
 **Performance Benefits:**
-- **3-5x faster** embedding generation through batch parallelization
-- **40-60% reduced** query response times via concurrent similarity searches  
+- **3.98 second average** response time with Google embeddings
+- **15 worker threads** handling Google's API constraints efficiently
+- **Parallel question processing** for multi-question requests  
 - **Optimal resource utilization** with configurable thread pools
-- **Graceful degradation** with automatic retry mechanisms
 
 ## Directory Structure
 
@@ -747,19 +840,21 @@ hackrx/
 ### Cache Performance
 | Metric | Cached Documents | Uncached Documents | Improvement |
 |--------|------------------|-------------------|-------------|
-| Response Time | 4-5 seconds | 60-90 seconds | **10-20x faster** |
+| Response Time | **3.98 seconds** | 60-90 seconds | **15-23x faster** |
 | Cache Hit Rate | 30% average | - | Reduces load by 1/3 |
 | Memory Usage | 16.9MB (7 docs) | - | Efficient storage |
 
-### Parallel Processing Performance
-| Component | Sequential | Parallel | Improvement |
-|-----------|------------|----------|-------------|
-| Embedding Generation | 45-60s | 12-18s | **3-5x faster** |
-| Query Processing | 8-12s | 3-5s | **40-60% faster** |
-| Similarity Search | 2-3s | 0.8-1.2s | **2-3x faster** |
+### Google Embedding Performance
+| Component | Configuration | Performance | Notes |
+|-----------|-------------|-------------|-------|
+| Embedding Model | gemini-embedding-001 | 768 dimensions | Latest multimodal model |
+| Thread Workers | 15 ThreadPoolExecutor | 3.98s average | Overcomes single-request limit |
+| Chunk Processing | 2048 size, 204 overlap | Optimal context | Balanced performance/accuracy |
+| Vector Search | FAISS 768-dimensional | Sub-second search | Parallel similarity search |
 
 ### Production Metrics
+- **Average Response Time**: 3988.18ms (Level 4 test performance)
 - **Throughput**: 300 requests/5min (sustained: 60 req/min)
 - **Burst Capacity**: 50 requests/minute for traffic spikes
-- **Security**: API key validation + IP monitoring
-- **Uptime**: Production-ready with comprehensive error handling
+- **Security**: SSL certificates + API key validation + IP monitoring
+- **Deployment**: Ngrok tunneling + production-ready configuration
