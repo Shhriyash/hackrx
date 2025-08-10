@@ -1,0 +1,57 @@
+{
+  "request_id": "1754837694_2091913300309226044",
+  "timestamp": "2025-08-10T20:24:58.778978",
+  "request": {
+    "document_url": "https://register.hackrx.in/utils/get-secret-token?hackTeam=1843",
+    "questions": [
+      "Go to the link and get the secret token and return it"
+    ],
+    "num_questions": 1
+  },
+  "response": {
+    "answers": [
+      "According to the document, the secret token is \"3dcf094b8412342b603099e6f03a013ba00f646fb7091cd786c2db6b75d81c99\". This is found within the `div` element with the id \"token\", as stated in the context: `<div id=\"token\">3dcf094b8412342b603099e6f03a013ba00f646fb7091cd786c2db6b75d81c99</div>`."
+    ],
+    "num_answers": 1,
+    "document_processing_debug": {
+      "chunk_count": 1,
+      "processing_time": 1.2625012397766113,
+      "chunks_preview": [
+        {
+          "chunk_id": "chunk_0",
+          "sequence_index": 0,
+          "page_number": "1",
+          "content_length": 1561,
+          "content_preview": "<!DOCTYPE html>\n      <html lang=\"en\">\n      <head>\n        <meta charset=\"UTF-8\" />\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n        <title>Secret Token</title>\n        <style>\n          body {\n            margin: 0;\n            background: linear-gradient(135deg, #1f1c2c, #928dab);\n            font-family: 'Courier New', monospace;\n            color: #fff;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            height: 100vh;\n            overflow: hidden;\n          }\n  \n          .box {\n            text-align: center;\n            padding: 30px;\n            border-radius: 16px;\n            background: rgba(255, 255, 255, 0.1);\n            backdrop-filter: blur(12px);\n            border: 1px solid rgba(255, 255, 255, 0.2);\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);\n            animation: fadeIn 1s ease-in-out;\n          }\n  \n          h1 {\n            font-size: 2rem;\n            margin-bottom: 1rem;\n          }\n  \n          #token {\n            font-size: 1.5rem;\n            color: #00ffcc;\n            word-break: break-word;\n          }\n  \n          @keyframes fadeIn {\n            from { opacity: 0; transform: scale(0.95); }\n            to { opacity: 1; transform: scale(1); }\n          }\n        </style>\n      </head>\n      <body>\n        <div class=\"box\">\n          <h1>🔒 Your Secret Token</h1>\n          <div id=\"token\">3dcf094b8412342b603099e6f03a013ba00f646fb7091cd786c2db6b75d81c99</div>\n        </div>\n      </body>\n      </html>"
+        }
+      ]
+    },
+    "qa_debug": {
+      "context_count": 1,
+      "total_context_length": 1561,
+      "parsed_successfully": true,
+      "prompt_preview": "\nBased on the following document context, answer the questions below. Return your response as a JSON object with a \"dummy_key\" field containing an array of answers in the exact order of the questions.\n\nCONTEXT:\n<!DOCTYPE html>\n      <html lang=\"en\">\n      <head>\n        <meta charset=\"UTF-8\" />\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n        <title>Secret Token</title>\n        <style>\n          body {\n            margin: 0;\n            background: linear-g...",
+      "llm_response_preview": "```json\n{\n  \"dummy_key\": [\n    \"According to the document, the secret token is \\\"3dcf094b8412342b603099e6f03a013ba00f646fb7091cd786c2db6b75d81c99\\\". This is found within the `div` element with the id \\\"token\\\", as stated in the context: `<div id=\\\"token\\\">3dcf094b8412342b603099e6f03a013ba00f646fb7091cd786c2db6b75d81c99</div>`.\"\n  ]\n}\n```...",
+      "retrieved_contexts": [
+        {
+          "index": 0,
+          "preview": "<!DOCTYPE html>\n      <html lang=\"en\">\n      <head>\n        <meta charset=\"UTF-8\" />\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n        <title>Secret Token</title>...",
+          "length": 1561
+        }
+      ]
+    }
+  },
+  "timing": {
+    "total_time": 4.504650115966797,
+    "document_processing_time": 1.2634949684143066,
+    "indexing_time": 0.5599386692047119,
+    "question_answering_time": 2.67965030670166,
+    "qa_breakdown": {
+      "embed_generation": 1.1363658905029297,
+      "context_retrieval": 0.0009989738464355469,
+      "llm_generation": 1.537140130996704,
+      "response_parsing": 0.0,
+      "total": 2.6785120964050293
+    }
+  }
+}

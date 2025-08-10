@@ -170,10 +170,10 @@ Return the text in a clean, readable format with clear page breaks indicated.
 
 class SimpleTextProcessor(DocumentProcessor):
     """
-    Simple document processor that extracts text directly from PDFs and DOCX files.
+    Simple document processor that extracts text from PDF, DOCX, TXT, and MD files.
     
     This processor extracts text without OCR, relying on embedded text content.
-    Supports both local files and URLs for PDF/DOCX documents.
+    Supports both local files and URLs for PDF/DOCX/TXT/MD documents.
     """
 
     def __init__(self, chunk_size: int = 9000, chunk_overlap: int = 300):
@@ -207,7 +207,7 @@ class SimpleTextProcessor(DocumentProcessor):
     
     def process_document(self, document_source: str) -> List[Dict[str, Any]]:
         """
-        Process a PDF or DOCX document and return chunks with metadata.
+        Process a PDF, DOCX, TXT, or MD document and return chunks with metadata.
         
         Args:
             document_source: Path to local file or URL to the document
@@ -234,18 +234,16 @@ class SimpleTextProcessor(DocumentProcessor):
                 
                 # Determine file type from content-type or URL
                 content_type = response.headers.get('content-type', '').lower()
-                if 'pdf' in content_type or document_source.lower().endswith('.pdf'):
+                
+                # Check supported file extensions
+                if (document_source.lower().endswith('.pdf') or 'pdf' in content_type):
                     file_type = 'pdf'
-                elif 'word' in content_type or document_source.lower().endswith(('.docx', '.doc')):
+                elif (document_source.lower().endswith(('.docx', '.doc')) or 'word' in content_type):
                     file_type = 'docx'
+                elif (document_source.lower().endswith(('.txt', '.md')) or 'text' in content_type):
+                    file_type = 'text'
                 else:
-                    # Try to guess from URL extension
-                    if document_source.lower().endswith('.pdf'):
-                        file_type = 'pdf'
-                    elif document_source.lower().endswith(('.docx', '.doc')):
-                        file_type = 'docx'
-                    else:
-                        raise ValueError(f"Unsupported file type. Could not determine if PDF or DOCX from: {document_source}")
+                    raise ValueError("unknown file type")
                 
             except httpx.HTTPError as e:
                 download_time = time.time() - download_start
@@ -255,6 +253,16 @@ class SimpleTextProcessor(DocumentProcessor):
             # Local file
             logger.info(f"Processing local file: {document_source}")
             file_path = Path(document_source)
+            
+            # Validate file type before checking existence
+            if file_path.suffix.lower() in ['.pdf']:
+                file_type = 'pdf'
+            elif file_path.suffix.lower() in ['.docx', '.doc']:
+                file_type = 'docx'
+            elif file_path.suffix.lower() in ['.txt', '.md']:
+                file_type = 'text'
+            else:
+                raise ValueError("unknown file type")
             
             if not file_path.exists():
                 raise ValueError(f"File not found: {document_source}")
@@ -266,14 +274,6 @@ class SimpleTextProcessor(DocumentProcessor):
             read_time = time.time() - read_start
             logger.info(f"File read completed in {read_time:.3f}s - Size: {len(doc_data)} bytes")
             
-            # Determine file type from extension
-            if file_path.suffix.lower() == '.pdf':
-                file_type = 'pdf'
-            elif file_path.suffix.lower() in ['.docx', '.doc']:
-                file_type = 'docx'
-            else:
-                raise ValueError(f"Unsupported file type: {file_path.suffix}. Only PDF and DOCX are supported.")
-            
             download_time = 0  # No download for local files
         
         # Extract text based on file type
@@ -282,6 +282,8 @@ class SimpleTextProcessor(DocumentProcessor):
             extracted_text = self._extract_pdf_text(doc_data)
         elif file_type == 'docx':
             extracted_text = self._extract_docx_text(doc_data)
+        elif file_type == 'text':
+            extracted_text = self._extract_text_content(doc_data, document_source)
         else:
             raise ValueError(f"Unsupported file type: {file_type}")
         
@@ -431,3 +433,48 @@ class SimpleTextProcessor(DocumentProcessor):
             extract_time = time.time() - start_time
             logger.error(f"DOCX text extraction failed after {extract_time:.3f}s: {e}")
             raise ValueError(f"Failed to extract text from DOCX: {e}")
+
+    def _extract_text_content(self, text_data: bytes, source: str) -> str:
+        """
+        Extract text content from TXT and MD files.
+        
+        Args:
+            text_data: Raw bytes of the text file
+            source: Source path/URL for error reporting
+            
+        Returns:
+            Extracted text content
+        """
+        start_time = time.time()
+        
+        try:
+            # Try to decode with common encodings
+            encodings = ['utf-8', 'utf-8-sig', 'latin-1', 'cp1252']
+            extracted_text = None
+            
+            for encoding in encodings:
+                try:
+                    extracted_text = text_data.decode(encoding)
+                    logger.info(f"Successfully decoded text file using {encoding} encoding")
+                    break
+                except UnicodeDecodeError:
+                    continue
+            
+            if extracted_text is None:
+                raise ValueError("Could not decode text file with any supported encoding")
+            
+            # Clean up the text
+            extracted_text = extracted_text.strip()
+            
+            extract_time = time.time() - start_time
+            logger.info(f"Text content extraction completed in {extract_time:.3f}s - {len(extracted_text)} characters extracted")
+            
+            if not extracted_text:
+                raise ValueError("No text content found in file.")
+            
+            return extracted_text
+            
+        except Exception as e:
+            extract_time = time.time() - start_time
+            logger.error(f"Text content extraction failed after {extract_time:.3f}s: {e}")
+            raise ValueError(f"Failed to extract text content from {source}: {e}")
